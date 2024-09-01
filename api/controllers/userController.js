@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const {
   USER_NOT_FOUND,
   EMAIL_ALREADY_EXISTS,
@@ -10,6 +11,7 @@ const {
   INTERNAL_SERVER_ERROR,
   FORBIDDEN,
   UNAUTHORIZED,
+  USER_DELETED_SUCCESSFULLY,
 } = require("../../utils/errorMessages");
 const userModel = require("../models/userModel");
 const {
@@ -69,7 +71,7 @@ const registerUser = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true in production
       sameSite: "Strict", // or 'Lax' based on your needs
-      maxAge: 3600000, // 1 hour in milliseconds
+      maxAge: 120 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(201).json({
@@ -121,7 +123,7 @@ const loginUser = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true in production
       sameSite: "Strict", // or 'Lax' based on your needs
-      maxAge: 3600000, // 1 hour in milliseconds
+      maxAge: 120 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
@@ -221,6 +223,37 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// Delete a user by ID
+const adminDeleteUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid ID format" });
+    }
+    // Check if the user exists
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: USER_NOT_FOUND });
+    }
+
+    // Extract public ID from profile picture URL
+    if (user.profilePicture) {
+      const publicId = user.profilePicture.split("/").pop().split(".")[0];
+      console.log(publicId);
+
+      // Delete the profile picture from Cloudinary
+      await deleteFromCloudinary(publicId);
+    }
+    await userModel.findByIdAndDelete(userId);
+    res.json({
+      message: USER_DELETED_SUCCESSFULLY,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // $$$$$$$$$$$$$$$
 // Update a user by ID
 const adminUpdateUserById = async (req, res) => {
@@ -232,17 +265,6 @@ const adminUpdateUserById = async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status(400).json({ error: error.message });
-  }
-};
-
-// Delete a user by ID
-const adminDeleteUserById = async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json({ message: "User deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 };
 

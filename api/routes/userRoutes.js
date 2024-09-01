@@ -52,18 +52,18 @@ router.patch(
   updateUserProfile
 );
 
+// Get user by ID route (admin)
+router.get("/:id", verifyLoginToken, checkAdminRole, getUserByIdForAdmin);
+
+// Delete user route (admin)
+router.delete("/:id", verifyLoginToken, checkAdminRole, adminDeleteUserById);
+
 // ############ Admin routes ############
 // $$$$$$$$$$$$$$
 
 router.get("/", verifyLoginToken, checkAdminRole, adminGetAllUsers);
 
-// Get user by ID route (admin)
-router.get("/:id", verifyLoginToken, checkAdminRole, getUserByIdForAdmin);
-
 // Update user route (admin)
 router.put("/:id", checkAdminRole, adminUpdateUserById);
-
-// Delete user route (admin)
-router.delete("/:id", checkAdminRole, adminDeleteUserById);
 
 module.exports = router;
