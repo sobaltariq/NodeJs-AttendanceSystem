@@ -1,0 +1,23 @@
+npm i bcrypt
+npm i body-parser
+npm i cors
+npm i dotenv
+npm i express
+npm i express-validator
+npm i jsonwebtoken
+npm i mongoose
+npm i nodemon
+npm i socket.io
+
+############
+npm i express mongoose nodemon bcrypt
+
+npm i body-parser cors dotenv express-validator jsonwebtoken
+
+npm i express mongoose nodemon bcrypt body-parser cors dotenv express-validator jsonwebtoken
+
+npm i socket.io multer 
+
+npm i cloudinary cookie-parser
+
+npm install csrf // CSRF attacks protection
