@@ -10,9 +10,11 @@ const {
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  changePassword,
 } = require("../controllers/userController");
 const {
   userRegistrationValidationRules,
+  changePasswordValidationRules,
 } = require("../../validator/userValidations");
 const validateRequest = require("../../middleware/express/validateRequestMiddleware");
 const upload = require("../../middleware/express/multerForImages");
@@ -23,12 +25,16 @@ const {
   validateProfilePictureRules,
 } = require("../../validator/pictureValidations");
 const { checkAdminRole } = require("../../middleware/express/userTypeCheck");
+const {
+  adminUpdateUserValidationRules,
+} = require("../../validator/updateProfileValidations");
 
 // User routes
+
 router.post(
   "/register",
   upload.single("profilePicture"),
-  checkAdminRole,
+  // checkAdminRole,
   userRegistrationValidationRules(),
   validateProfilePictureRules,
   validateRequest,
@@ -39,10 +45,8 @@ router.post("/login", loginUser);
 
 router.post("/logout", verifyLoginToken, logoutUser);
 
-// Get profile route (authenticated user)
 router.get("/profile", verifyLoginToken, getUserProfile);
 
-// Update user profile route (authenticated user)
 router.patch(
   "/profile",
   upload.single("profilePicture"),
@@ -52,18 +56,28 @@ router.patch(
   updateUserProfile
 );
 
-// Get user by ID route (admin)
-router.get("/:id", verifyLoginToken, checkAdminRole, getUserByIdForAdmin);
-
-// Delete user route (admin)
-router.delete("/:id", verifyLoginToken, checkAdminRole, adminDeleteUserById);
+// Route for updating password
+router.patch(
+  "/change-password/:id",
+  verifyLoginToken,
+  changePasswordValidationRules(),
+  validateRequest,
+  changePassword
+);
 
 // ############ Admin routes ############
-// $$$$$$$$$$$$$$
+router.get("/profiles", verifyLoginToken, checkAdminRole, adminGetAllUsers);
+router.get("/:id", verifyLoginToken, checkAdminRole, getUserByIdForAdmin);
 
-router.get("/", verifyLoginToken, checkAdminRole, adminGetAllUsers);
+router.delete("/:id", verifyLoginToken, checkAdminRole, adminDeleteUserById);
 
-// Update user route (admin)
-router.put("/:id", checkAdminRole, adminUpdateUserById);
+router.patch(
+  "/update-user/:id",
+  verifyLoginToken,
+  checkAdminRole,
+  adminUpdateUserValidationRules(),
+  validateRequest,
+  adminUpdateUserById
+);
 
 module.exports = router;

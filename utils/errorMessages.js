@@ -30,6 +30,9 @@ module.exports = {
     "Invalid action. Please use 'approve' or 'reject'.",
   REQUEST_REVIEWED_SUCCESSFULLY: "Request reviewed successfully",
   USER_DELETED_SUCCESSFULLY: "User deleted successfully",
+  INVALID_ID_FORMAT: "Invalid ID format",
+  USER_UPDATED_SUCCESSFULLY: "User updated successfully",
+  PASSWORD_CHANGED_SUCCESSFULLY: "Password changed successfully",
 
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",

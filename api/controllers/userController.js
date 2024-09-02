@@ -12,6 +12,11 @@ const {
   FORBIDDEN,
   UNAUTHORIZED,
   USER_DELETED_SUCCESSFULLY,
+  INVALID_ID_FORMAT,
+  USER_UPDATED_SUCCESSFULLY,
+  NO_FIELDS_TO_UPDATE,
+  UPDATED_PROFILE_PICTURE_SUCCESSFULLYl,
+  PASSWORD_CHANGED_SUCCESSFULLY,
 } = require("../../utils/errorMessages");
 const userModel = require("../models/userModel");
 const {
@@ -215,7 +220,7 @@ const updateUserProfile = async (req, res) => {
       .select("-password -__v");
 
     return res.status(200).json({
-      message: UPDATED_PROFILE_PICTURE_SUCCESSFULLY,
+      message: UPDATED_PROFILE_PICTURE_SUCCESSFULLYl,
       user: updatedUser,
     });
   } catch (error) {
@@ -229,7 +234,7 @@ const adminDeleteUserById = async (req, res) => {
     const userId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ error: "Invalid ID format" });
+      return res.status(400).json({ error: INVALID_ID_FORMAT });
     }
     // Check if the user exists
     const user = await userModel.findById(userId);
@@ -250,113 +255,103 @@ const adminDeleteUserById = async (req, res) => {
       message: USER_DELETED_SUCCESSFULLY,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
-// $$$$$$$$$$$$$$$
 // Update a user by ID
 const adminUpdateUserById = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const userId = req.params.id;
+    const updates = req.body;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: NO_FIELDS_TO_UPDATE });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        error: INVALID_ID_FORMAT,
+      });
+    }
+    // Check if the user exists
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updates, {
       new: true,
+      select: "-password -__v",
     });
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json(user);
+    if (!updatedUser) {
+      return res.status(404).json({ error: USER_NOT_FOUND });
+    }
+
+    res.status(200).json({
+      message: USER_UPDATED_SUCCESSFULLY,
+      updatedUser,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
+// $$$$$$$$$$$$$$$
 
 // Get all users
 const adminGetAllUsers = async (req, res) => {
   try {
-    const usersFound = await userModel.find().select("-password -jobTitle");
-    if (!usersFound) {
-      return res.status(404).json({
-        message: USER_NOT_FOUND,
-        email: req.user.email,
-      });
-    }
+    // Get page and limit from query parameters, default to page 1 and 5 items per page
+    const currentPage = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    // Calculate the skip value
+    const skip = (currentPage - 1) * limit;
+
+    // Find all users with pagination
+    const users = await userModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .select("-password -jobTitle");
+
+    // Get the total count of users
+    const totalUsers = await userModel.countDocuments();
+
+    // Calculate total number of pages
+    const totalPages = Math.ceil(totalUsers / limit);
+
     res.status(200).json({
-      users: usersFound,
+      users,
+      currentPage,
+      totalPages,
+      totalUsers,
     });
+
+    // const usersFound = await userModel.find().select("-password -jobTitle");
   } catch (error) {
-    // console.log(err.message);
     res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
   }
-  //  try {
-  //    // Pagination parameters
-  //    const page = parseInt(req.query.page, 10) || 1;
-  //    const limit = parseInt(req.query.limit, 10) || 10;
+};
 
-  //    // Validate pagination parameters
-  //    if (page < 1 || limit < 1) {
-  //      return res.status(400).json({ message: errorMessages.BAD_REQUEST });
-  //    }
+const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+    const { id } = req.params;
 
-  //    // Find users with pagination and excluding sensitive fields
-  //    const users = await User.find()
-  //      .skip((page - 1) * limit)
-  //      .limit(limit)
-  //      .select("-password -jobTitle"); // Exclude sensitive fields
+    const user = await userModel.findById(id).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: USER_NOT_FOUND });
+    }
 
-  //    // Get total count of users for pagination info
-  //    const totalUsers = await User.countDocuments();
+    // Check if the password is correct
+    const passwordMatch = await user.comparePassword(oldPassword);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: INVALID_PASSWORD });
+    }
 
-  //    // Send users and pagination info
-  //    res.status(200).json({
-  //      totalUsers,
-  //      currentPage: page,
-  //      totalPages: Math.ceil(totalUsers / limit),
-  //      users,
-  //    });
-  //  } catch (error) {
-  //    // Handle unexpected errors
-  //    console.error(error);
-  //    res.status(500).json({ message: errorMessages.INTERNAL_SERVER_ERROR });
-  //  }
-  // try {
-  //   // Query parameters for pagination and filtering
-  //   const { page = 1, limit = 10, name, email, role } = req.query;
-
-  //   // Validate pagination parameters
-  //   const pageNumber = parseInt(page, 10);
-  //   const limitNumber = parseInt(limit, 10);
-  //   if (pageNumber < 1 || limitNumber < 1) {
-  //     return res.status(400).json({ message: errorMessages.BAD_REQUEST });
-  //   }
-
-  //   // Build the query object based on filters
-  //   const query = {};
-  //   if (name) query.name = new RegExp(name, "i"); // Case-insensitive search
-  //   if (email) query.email = new RegExp(email, "i"); // Case-insensitive search
-  //   if (role) query.role = role;
-
-  //   // Find users with pagination
-  //   const users = await User.find(query)
-  //     .skip((pageNumber - 1) * limitNumber)
-  //     .limit(limitNumber)
-  //     .select("-password -jobTitle"); // Exclude sensitive fields
-
-  //   // Get total count for pagination info
-  //   const totalUsers = await User.countDocuments(query);
-
-  //   // Send the paginated response
-  //   res.status(200).json({
-  //     users,
-  //     pagination: {
-  //       page: pageNumber,
-  //       limit: limitNumber,
-  //       totalUsers,
-  //       totalPages: Math.ceil(totalUsers / limitNumber),
-  //     },
-  //   });
-  // } catch (error) {
-  //   // Handle unexpected errors
-  //   console.error(error);
-  //   res.status(500).json({ message: errorMessages.INTERNAL_SERVER_ERROR });
-  // }
+    // Hash the new password
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json({ message: PASSWORD_CHANGED_SUCCESSFULLY });
+  } catch (error) {
+    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
+  }
 };
 
 module.exports = {
@@ -369,4 +364,5 @@ module.exports = {
   adminDeleteUserById,
   updateUserProfile,
   adminGetAllUsers,
+  changePassword,
 };

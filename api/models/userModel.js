@@ -19,18 +19,28 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: "user",
     },
-    gender: { type: String },
+    gender: { type: String, enum: ["male", "female", "other"] },
     bankName: { type: String },
     ibanNumber: { type: String },
     whatsApp: { type: String },
     phoneNumber: { type: String },
+    salary: { type: String },
+    nic: { type: String },
+    dateOfBirth: { type: Date },
     address: { type: String },
     emergencyContact: { type: String },
     jobTitle: { type: String },
     department: { type: String },
     officeLocation: { type: String },
     position: { type: String, default: "Internee" },
-    leaveBalance: { type: Number, default: 0 },
+    paidLeavesTaken: {
+      type: Number,
+      default: 0,
+    },
+    paidLeavesResetDate: {
+      type: Date,
+      default: () => new Date().setMonth(0, 1), // Reset date to January 1st
+    },
     lastLogin: { type: Date },
     attendanceHistory: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Attendance" },
@@ -88,6 +98,20 @@ userSchema.methods.comparePassword = async function (password) {
 // Middleware to update timestamps
 userSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
+  next();
+});
+
+// Middleware to reset paid leaves count at the beginning of the year
+userSchema.pre("save", function (next) {
+  const now = new Date();
+  if (now > this.paidLeavesResetDate) {
+    this.paidLeavesTaken = 0;
+    this.paidLeavesResetDate = new Date().setFullYear(
+      now.getFullYear() + 1,
+      0,
+      1
+    ); // Next January 1st
+  }
   next();
 });
 

@@ -41,4 +41,23 @@ attendanceSchema.pre("save", function (next) {
   next();
 });
 
+// Virtual field to calculate attendance for the current month
+attendanceSchema.virtual("currentMonthAttendance").get(function () {
+  const startOfMonth = new Date(
+    this.todayDate.getFullYear(),
+    this.todayDate.getMonth(),
+    1
+  );
+  const endOfMonth = new Date(
+    this.todayDate.getFullYear(),
+    this.todayDate.getMonth() + 1,
+    0
+  );
+
+  return mongoose.model("Attendance").countDocuments({
+    userId: this.userId,
+    todayDate: { $gte: startOfMonth, $lt: endOfMonth },
+  });
+});
+
 module.exports = mongoose.model("Attendance", attendanceSchema);

@@ -22,6 +22,8 @@ const requestSensitiveFieldUpdate = async (req, res) => {
       ibanNumber,
       whatsApp,
       accountNumber,
+      phoneNumber,
+      emergencyContact,
       address,
     } = req.body;
 
@@ -32,6 +34,8 @@ const requestSensitiveFieldUpdate = async (req, res) => {
       ibanNumber,
       whatsApp,
       accountNumber,
+      phoneNumber,
+      emergencyContact,
       address,
     };
 
