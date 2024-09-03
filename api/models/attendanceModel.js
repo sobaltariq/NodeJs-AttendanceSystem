@@ -8,10 +8,13 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    todayDate: { type: Date, default: Date.now },
+    todayDate: {
+      type: Date,
+      default: () => new Date().setHours(0, 0, 0, 0), // Resets time to midnight
+    },
     status: {
       type: String,
-      enum: ["present", "absent", "late", "early", "on_leave"],
+      enum: ["present", "absent", "late", "early"],
       required: true,
     },
     checkInTime: { type: Date, default: Date.now },
@@ -27,11 +30,40 @@ const attendanceSchema = new mongoose.Schema(
 // Index to speed up attendance queries
 attendanceSchema.index({ userId: 1, todayDate: 1 }, { unique: true });
 
-// Middleware to validate attendance data
+// Middleware to set the attendance status based on check-in time
 attendanceSchema.pre("save", function (next) {
-  if (!this.userId || !this.status) {
-    return next(new Error("User ID and status are required."));
+  const checkInHour = this.checkInTime.getHours();
+
+  if (checkInHour < process.env.ATTENDANCE_TIME_1) {
+    this.status = "early";
+  } else if (
+    checkInHour >= process.env.ATTENDANCE_TIME_1 &&
+    checkInHour < process.env.ATTENDANCE_TIME_2
+  ) {
+    this.status = "present";
+  } else if (
+    checkInHour >= process.env.ATTENDANCE_TIME_2 &&
+    checkInHour < process.env.ATTENDANCE_TIME_3
+  ) {
+    this.status = "late";
+  } else if (checkInHour >= process.env.ATTENDANCE_TIME_3) {
+    this.status = "absent";
   }
+
+  next();
+});
+
+// Middleware to check if a user already has an attendance record for today
+attendanceSchema.pre("save", async function (next) {
+  const existingAttendance = await mongoose.model("Attendance").findOne({
+    userId: this.userId,
+    todayDate: this.todayDate,
+  });
+
+  if (existingAttendance) {
+    return next(new Error("Attendance for today already exists."));
+  }
+
   next();
 });
 

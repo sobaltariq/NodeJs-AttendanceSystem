@@ -1,18 +1,42 @@
+const {
+  INTERNAL_SERVER_ERROR,
+  DUPLICATE_ATTENDANCE_ENTRY,
+} = require("../../utils/errorMessages");
+const attendanceModel = require("../models/attendanceModel");
 const Attendance = require("../models/attendanceModel");
 
 // Create a new attendance record
-exports.createAttendance = async (req, res) => {
+createAttendance = async (req, res) => {
   try {
-    const attendance = new Attendance(req.body);
-    await attendance.save();
-    res.status(201).json(attendance);
+    let userId;
+    if (req.user.role === "user") {
+      userId = req.user.id;
+
+      console.log("user", userId);
+    } else {
+      userId = req.body.userId;
+      console.log("admin", userId);
+    }
+
+    // Check if an attendance record already exists for today
+    const existingAttendance = await attendanceModel.findOne({
+      userId,
+      todayDate: new Date().setHours(0, 0, 0, 0),
+    });
+
+    if (existingAttendance) {
+      return res.status(400).json({
+        message: DUPLICATE_ATTENDANCE_ENTRY,
+      });
+    }
+    res.status(201).json("attendance");
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
 // Get all attendance records
-exports.getAllAttendance = async (req, res) => {
+getAllAttendance = async (req, res) => {
   try {
     const attendanceRecords = await Attendance.find();
     res.json(attendanceRecords);
@@ -22,7 +46,7 @@ exports.getAllAttendance = async (req, res) => {
 };
 
 // Get attendance by user ID
-exports.getAttendanceByUserId = async (req, res) => {
+getAttendanceByUserId = async (req, res) => {
   try {
     const attendance = await Attendance.find({ userId: req.params.userId });
     res.json(attendance);
@@ -32,7 +56,7 @@ exports.getAttendanceByUserId = async (req, res) => {
 };
 
 // Update an attendance record by ID
-exports.updateAttendance = async (req, res) => {
+updateAttendance = async (req, res) => {
   try {
     const attendance = await Attendance.findByIdAndUpdate(
       req.params.id,
@@ -48,7 +72,7 @@ exports.updateAttendance = async (req, res) => {
 };
 
 // Delete an attendance record by ID
-exports.deleteAttendance = async (req, res) => {
+deleteAttendance = async (req, res) => {
   try {
     const attendance = await Attendance.findByIdAndDelete(req.params.id);
     if (!attendance)
@@ -57,4 +81,12 @@ exports.deleteAttendance = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+module.exports = {
+  createAttendance,
+  getAllAttendance,
+  getAttendanceByUserId,
+  updateAttendance,
+  deleteAttendance,
 };

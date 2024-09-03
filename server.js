@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 // Import routes
 const userRoutes = require("./api/routes/userRoutes");
 const profileRoutes = require("./api/routes/profileUpdateRoutes");
-// const attendanceRoutes = require("./api/routes/attendanceRoutes");
+const attendanceRoutes = require("./api/routes/attendanceRoutes");
 // const leaveRequestRoutes = require("./api/routes/leaveRequestRoutes");
 // const notificationRoutes = require("./api/routes/notificationRoutes");
 // const noticeBoardRoutes = require("./api/routes/noticeBoardRoutes");
@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/profile", profileRoutes);
-// app.use("/attendance", attendanceRoutes);
+app.use("/attendance", attendanceRoutes);
 // app.use("/leave-requests", leaveRequestRoutes);
 // app.use("/notifications", notificationRoutes);
 // app.use("/notice-board", noticeBoardRoutes);

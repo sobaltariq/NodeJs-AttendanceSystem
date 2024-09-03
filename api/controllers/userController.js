@@ -22,7 +22,7 @@ const userModel = require("../models/userModel");
 const {
   uploadImageToCloudinary,
   deleteFromCloudinary,
-} = require("../../middleware/express/cloudinaryMiddleware");
+} = require("../../utils/cloudinaryImages");
 const { generateToken } = require("../../utils/jwtTokenUtils");
 const pendingProfileUpdateModel = require("../models/pendingProfileUpdateModel");
 

@@ -1,13 +1,17 @@
 const express = require("express");
-const attendanceController = require("../controllers/attendanceController");
+const {
+  verifyLoginToken,
+} = require("../../middleware/express/verifyLoginToken");
+
+const { createAttendance } = require("../controllers/attendanceController");
 
 // Attendance routes
 const router = express.Router();
 
-router.post("/", attendanceController.createAttendance);
-router.get("/", attendanceController.getAllAttendance);
-router.get("/user/:userId", attendanceController.getAttendanceByUserId);
-router.put("/:id", attendanceController.updateAttendance);
-router.delete("/:id", attendanceController.deleteAttendance);
+router.post("/", verifyLoginToken, createAttendance);
+// router.get("/", verifyLoginToken, getAllAttendance);
+// router.get("/user/:userId", verifyLoginToken, getAttendanceByUserId);
+// router.put("/:id", verifyLoginToken, updateAttendance);
+// router.delete("/:id", verifyLoginToken, deleteAttendance);
 
 module.exports = router;

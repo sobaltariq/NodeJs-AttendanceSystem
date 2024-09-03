@@ -34,6 +34,11 @@ module.exports = {
   USER_UPDATED_SUCCESSFULLY: "User updated successfully",
   PASSWORD_CHANGED_SUCCESSFULLY: "Password changed successfully",
 
+  // Attendance-related errors
+  ATTENDANCE_NOT_FOUND: "Attendance record not found",
+  DUPLICATE_ATTENDANCE_ENTRY: "Duplicate attendance entry for the same day",
+  INVALID_ATTENDANCE_STATUS: "Invalid attendance status",
+
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
   // Product-related errors
@@ -51,10 +56,7 @@ module.exports = {
   //   LEAVE_LIMIT_EXCEEDED: "Leave limit exceeded for the year",
   //   INVALID_LEAVE_DATES: "Invalid leave dates provided",
   //   LEAVE_BALANCE_INSUFFICIENT: "Insufficient leave balance",
-  // Attendance-related errors
-  //   ATTENDANCE_NOT_FOUND: "Attendance record not found",
-  //   DUPLICATE_ATTENDANCE_ENTRY: "Duplicate attendance entry for the same day",
-  //   INVALID_ATTENDANCE_STATUS: "Invalid attendance status",
+
   // Notification-related errors
   //   NOTIFICATION_NOT_FOUND: "Notification not found",
   //   INVALID_NOTIFICATION_TYPE: "Invalid notification type",
