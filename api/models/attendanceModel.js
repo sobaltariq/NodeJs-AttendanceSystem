@@ -34,19 +34,19 @@ attendanceSchema.index({ userId: 1, todayDate: 1 }, { unique: true });
 attendanceSchema.pre("save", function (next) {
   const checkInHour = this.checkInTime.getHours();
 
-  if (checkInHour < process.env.ATTENDANCE_TIME_1) {
+  if (checkInHour < parseInt(process.env.ATTENDANCE_TIME_1, 10)) {
     this.status = "early";
   } else if (
-    checkInHour >= process.env.ATTENDANCE_TIME_1 &&
-    checkInHour < process.env.ATTENDANCE_TIME_2
+    checkInHour >= parseInt(process.env.ATTENDANCE_TIME_1, 10) &&
+    checkInHour < parseInt(process.env.ATTENDANCE_TIME_2, 10)
   ) {
     this.status = "present";
   } else if (
-    checkInHour >= process.env.ATTENDANCE_TIME_2 &&
-    checkInHour < process.env.ATTENDANCE_TIME_3
+    checkInHour >= parseInt(process.env.ATTENDANCE_TIME_2, 10) &&
+    checkInHour < parseInt(process.env.ATTENDANCE_TIME_3, 10)
   ) {
     this.status = "late";
-  } else if (checkInHour >= process.env.ATTENDANCE_TIME_3) {
+  } else {
     this.status = "absent";
   }
 
@@ -55,6 +55,8 @@ attendanceSchema.pre("save", function (next) {
 
 // Middleware to check if a user already has an attendance record for today
 attendanceSchema.pre("save", async function (next) {
+  if (!this.isNew) return next(); // Skip check for existing records during updates
+
   const existingAttendance = await mongoose.model("Attendance").findOne({
     userId: this.userId,
     todayDate: this.todayDate,

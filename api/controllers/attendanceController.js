@@ -1,12 +1,19 @@
 const {
   INTERNAL_SERVER_ERROR,
   DUPLICATE_ATTENDANCE_ENTRY,
+  USER_NOT_FOUND,
+  ATTENDANCE_NOT_FOUND,
+  ATTENDANCE_CREATED_SUCCESSFULLY,
+  UNAUTHORIZED_ACCESS,
+  INVALID_ATTENDANCE_STATUS,
+  INVALID_DATE_FORMAT,
+  ATTENDANCE_ALREADY_UPDATED,
 } = require("../../utils/errorMessages");
 const attendanceModel = require("../models/attendanceModel");
-const Attendance = require("../models/attendanceModel");
+const userModel = require("../models/userModel");
 
 // Create a new attendance record
-createAttendance = async (req, res) => {
+const markAttendance = async (req, res) => {
   try {
     let userId;
     if (req.user.role === "user") {
@@ -26,67 +33,260 @@ createAttendance = async (req, res) => {
 
     if (existingAttendance) {
       return res.status(400).json({
+        success: false,
         message: DUPLICATE_ATTENDANCE_ENTRY,
       });
     }
-    res.status(201).json("attendance");
+
+    // Create a new attendance record
+    const newAttendance = new attendanceModel({
+      userId,
+      todayDate: new Date().setHours(0, 0, 0, 0),
+      status: "present",
+    });
+
+    await newAttendance.save();
+
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      { $push: { attendanceHistory: newAttendance._id } },
+      {
+        new: true,
+      }
+    );
+    console.log(user);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: USER_NOT_FOUND });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: ATTENDANCE_CREATED_SUCCESSFULLY,
+      newAttendance,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(400).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
-// Get all attendance records
-getAllAttendance = async (req, res) => {
+// Controller to get today's attendance records for all users
+const getTodayAttendanceForAllUsers = async (req, res) => {
   try {
-    const attendanceRecords = await Attendance.find();
-    res.json(attendanceRecords);
+    const todayDate = new Date().setHours(0, 0, 0, 0);
+    console.log(todayDate);
+
+    const todayAttendanceRecords = await attendanceModel.find({ todayDate });
+    if (!todayAttendanceRecords) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      todayAttendanceRecords,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
+  }
+};
+
+// Controller to get attendance records for all users for the current month
+const getAttendanceForCurrentMonth = async (req, res) => {
+  try {
+    const { month, year } = req.query;
+
+    const targetMonth = month ? parseInt(month, 10) : new Date().getMonth();
+    const targetYear = year ? parseInt(year, 10) : new Date().getFullYear();
+
+    const startOfMonth = new Date(targetYear, targetMonth, 1);
+    const endOfMonth = new Date(targetYear, targetMonth + 1, 0);
+
+    const attendanceRecords = await attendanceModel.find({
+      todayDate: { $gte: startOfMonth, $lte: endOfMonth },
+    });
+
+    if (!attendanceRecords) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      attendanceRecords,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+// Controller to get attendance records for all users for the current year
+const getAttendanceForCurrentYear = async (req, res) => {
+  try {
+    const { year } = req.query;
+
+    const targetYear = year ? parseInt(year, 10) : new Date().getFullYear();
+
+    const startOfYear = new Date(targetYear, 0, 1);
+    const endOfYear = new Date(targetYear + 1, 0, 0);
+
+    const attendanceRecords = await attendanceModel.find({
+      todayDate: { $gte: startOfYear, $lt: endOfYear },
+    });
+
+    if (!attendanceRecords.length) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      attendanceRecords,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+// Controller to get attendance records for all users for all time
+const getAttendanceForAllTime = async (req, res) => {
+  try {
+    const attendances = await attendanceModel.find();
+
+    if (!attendances.length) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({ success: true, data: attendances });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
 // Get attendance by user ID
-getAttendanceByUserId = async (req, res) => {
+const getAttendanceByUserId = async (req, res) => {
   try {
-    const attendance = await Attendance.find({ userId: req.params.userId });
-    res.json(attendance);
+    const { userId } = req.params;
+    const { id } = req.user;
+    console.log(userId, id);
+
+    // If the id in the request body matches the userId in the URL, proceed
+    if (id && id === userId) {
+      const attendance = await attendanceModel.find({ userId });
+
+      if (!attendance) {
+        return res.status(404).json({
+          success: false,
+          message: ATTENDANCE_NOT_FOUND,
+        });
+      }
+
+      return res.status(200).json({ success: true, data: attendance });
+    }
+
+    // If id doesn't match userId, check if the user is an admin
+    if (req.user.role !== "admin" && req.user.role !== "superAdmin") {
+      return res.status(403).json({
+        success: false,
+        message: UNAUTHORIZED_ACCESS,
+      });
+    }
+    // Proceed to get attendance if the user is an admin or super admin
+    const attendance = await attendanceModel.find({ userId });
+
+    if (!attendance) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({ success: true, data: attendance });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
 // Update an attendance record by ID
-updateAttendance = async (req, res) => {
+const updateAttendance = async (req, res) => {
   try {
-    const attendance = await Attendance.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!attendance)
-      return res.status(404).json({ error: "Attendance not found" });
-    res.json(attendance);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+    const { userId } = req.params;
+    const { status, date } = req.body;
 
-// Delete an attendance record by ID
-deleteAttendance = async (req, res) => {
-  try {
-    const attendance = await Attendance.findByIdAndDelete(req.params.id);
-    if (!attendance)
-      return res.status(404).json({ error: "Attendance not found" });
-    res.json({ message: "Attendance deleted successfully" });
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({
+        message: INVALID_DATE_FORMAT,
+      });
+    }
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: INVALID_ATTENDANCE_STATUS,
+      });
+    }
+
+    // Find the attendance record for the given user and date
+    const attendance = await attendanceModel.findOne({
+      userId,
+      todayDate: parsedDate.setHours(0, 0, 0, 0),
+    });
+
+    if (!attendance) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+    if (attendance.status === status) {
+      return res.status(400).json({
+        success: false,
+        message: `${ATTENDANCE_ALREADY_UPDATED} to ${status}`,
+      });
+    }
+
+    attendance.status = status;
+    await attendance.save();
+
+    res.status(200).json({ success: true, data: attendance });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
 module.exports = {
-  createAttendance,
-  getAllAttendance,
+  markAttendance,
+  getTodayAttendanceForAllUsers,
+  getAttendanceForCurrentMonth,
+  getAttendanceForCurrentYear,
+  getAttendanceForAllTime,
   getAttendanceByUserId,
   updateAttendance,
-  deleteAttendance,
 };

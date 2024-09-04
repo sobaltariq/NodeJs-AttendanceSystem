@@ -6,6 +6,7 @@ module.exports = {
   UNAUTHORIZED: "Unauthorized",
   FORBIDDEN: "Forbidden",
   UNAUTHORIZED_ACCESS: "You do not have permission to access this resource.",
+  INVALID_DATE_FORMAT: "Invalid date format",
 
   // ##### User-related errors #####
   USER_NOT_FOUND: "User not found",
@@ -38,6 +39,8 @@ module.exports = {
   ATTENDANCE_NOT_FOUND: "Attendance record not found",
   DUPLICATE_ATTENDANCE_ENTRY: "Duplicate attendance entry for the same day",
   INVALID_ATTENDANCE_STATUS: "Invalid attendance status",
+  ATTENDANCE_CREATED_SUCCESSFULLY: "Attendance created successfully",
+  ATTENDANCE_ALREADY_UPDATED: "Attendance already updated",
 
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
