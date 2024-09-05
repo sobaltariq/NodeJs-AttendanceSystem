@@ -1,9 +1,9 @@
 const express = require("express");
 const {
   deleteFeedback,
-  getFeedbackById,
-  getAllFeedback,
+  getAllAndOneFeedback,
   createFeedback,
+  updateFeedback,
 } = require("../controllers/feedbackController");
 const {
   verifyLoginToken,
@@ -24,8 +24,11 @@ router.post(
   validateRequest,
   createFeedback
 );
-router.get("/", verifyLoginToken, checkAdminRole, getAllFeedback);
-router.get("/:id", verifyLoginToken, checkAdminRole, getFeedbackById);
+
+router.get("/", verifyLoginToken, checkAdminRole, getAllAndOneFeedback);
+
+router.patch("/:id", verifyLoginToken, checkAdminRole, updateFeedback);
+
 router.delete("/:id", verifyLoginToken, checkAdminRole, deleteFeedback);
 
 module.exports = router;

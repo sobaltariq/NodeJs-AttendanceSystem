@@ -42,6 +42,15 @@ module.exports = {
   ATTENDANCE_CREATED_SUCCESSFULLY: "Attendance created successfully",
   ATTENDANCE_ALREADY_UPDATED: "Attendance already updated",
 
+  // Feedback
+  FEEDBACK_NOT_FOUND: "Feedback not found",
+  FEEDBACK_ALREADY_SUBMITTED: "Feedback already submitted",
+  FEEDBACK_CREATED_SUCCESSFULLY: "Feedback submitted successfully",
+  FEEDBACK_UPDATED_SUCCESSFULLY: "Feedback updated successfully",
+  INVALID_STATUS: "Invalid status",
+  FEEDBACK_ALREADY_UPDATED: "Feedback already updated",
+  FEEDBACK_DELETED_SUCCESSFULLY: "Feedback deleted successfully",
+
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
   // Product-related errors
