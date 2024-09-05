@@ -32,7 +32,7 @@ const attendanceRoutes = require("./api/routes/attendanceRoutes");
 // const notificationRoutes = require("./api/routes/notificationRoutes");
 // const noticeBoardRoutes = require("./api/routes/noticeBoardRoutes");
 // const employerOfTheMonthRoutes = require("./api/routes/employerOfTheMonthRoutes");
-// const feedbackRoutes = require("./api/routes/feedbackRoutes");
+const feedbackRoutes = require("./api/routes/feedbackRoutes");
 // const chatRoutes = require("./api/routes/chatRoutes");
 
 // use routes
@@ -51,7 +51,7 @@ app.use("/attendance", attendanceRoutes);
 // app.use("/notifications", notificationRoutes);
 // app.use("/notice-board", noticeBoardRoutes);
 // app.use("/employers-of-the-month", employerOfTheMonthRoutes);
-// app.use("/feedback", feedbackRoutes);
+app.use("/feedback", feedbackRoutes);
 // app.use("/chats", chatRoutes);
 
 app.use((req, res) => {

@@ -1,9 +1,9 @@
-const Feedback = require("../models/feedbackModel");
+const feedbackModel = require("../models/feedbackModel");
 
 // Create new feedback
-exports.createFeedback = async (req, res) => {
+const createFeedback = async (req, res) => {
   try {
-    const feedback = new Feedback(req.body);
+    const feedback = new feedbackModel(req.body);
     await feedback.save();
     res.status(201).json(feedback);
   } catch (error) {
@@ -12,9 +12,9 @@ exports.createFeedback = async (req, res) => {
 };
 
 // Get all feedback
-exports.getAllFeedback = async (req, res) => {
+const getAllFeedback = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find();
+    const feedbacks = await feedbackModel.find();
     res.json(feedbacks);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -22,9 +22,9 @@ exports.getAllFeedback = async (req, res) => {
 };
 
 // Get feedback by ID
-exports.getFeedbackById = async (req, res) => {
+const getFeedbackById = async (req, res) => {
   try {
-    const feedback = await Feedback.findById(req.params.id);
+    const feedback = await feedbackModel.findById(req.params.id);
     if (!feedback) return res.status(404).json({ error: "Feedback not found" });
     res.json(feedback);
   } catch (error) {
@@ -32,21 +32,8 @@ exports.getFeedbackById = async (req, res) => {
   }
 };
 
-// Update feedback by ID
-exports.updateFeedback = async (req, res) => {
-  try {
-    const feedback = await Feedback.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!feedback) return res.status(404).json({ error: "Feedback not found" });
-    res.json(feedback);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
 // Delete feedback by ID
-exports.deleteFeedback = async (req, res) => {
+const deleteFeedback = async (req, res) => {
   try {
     const feedback = await Feedback.findByIdAndDelete(req.params.id);
     if (!feedback) return res.status(404).json({ error: "Feedback not found" });
@@ -54,4 +41,11 @@ exports.deleteFeedback = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+module.exports = {
+  createFeedback,
+  getAllFeedback,
+  getFeedbackById,
+  deleteFeedback,
 };

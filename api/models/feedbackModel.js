@@ -8,7 +8,7 @@ const feedbackSchema = new mongoose.Schema(
       enum: ["Bug Report", "Feature Request"],
       required: true,
     },
-    message: { type: String, required: true },
+    message: { type: String, required: true, minlength: 10 },
     screenshot: { type: String },
     status: {
       type: String,
@@ -21,5 +21,6 @@ const feedbackSchema = new mongoose.Schema(
 );
 
 feedbackSchema.index({ user: 1, status: 1 });
+feedbackSchema.index({ feedbackType: 1 });
 
 module.exports = mongoose.model("Feedback", feedbackSchema);

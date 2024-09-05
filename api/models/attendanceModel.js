@@ -14,7 +14,7 @@ const attendanceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["present", "absent", "late", "early"],
+      enum: ["present", "absent", "late", "early, leave"],
       required: true,
     },
     checkInTime: { type: Date, default: Date.now },
@@ -22,6 +22,10 @@ const attendanceSchema = new mongoose.Schema(
     location: {
       lat: { type: Number },
       lng: { type: Number },
+    },
+    leaveRequestId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LeaveRequest",
     },
   },
   { timestamps: true }
@@ -66,12 +70,6 @@ attendanceSchema.pre("save", async function (next) {
     return next(new Error("Attendance for today already exists."));
   }
 
-  next();
-});
-
-// Middleware to update timestamps
-attendanceSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
   next();
 });
 

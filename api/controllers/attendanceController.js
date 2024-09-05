@@ -25,10 +25,13 @@ const markAttendance = async (req, res) => {
       console.log("admin", userId);
     }
 
+    const todayDate = new Date().setHours(0, 0, 0, 0);
+    console.log(todayDate);
+
     // Check if an attendance record already exists for today
     const existingAttendance = await attendanceModel.findOne({
       userId,
-      todayDate: new Date().setHours(0, 0, 0, 0),
+      todayDate,
     });
 
     if (existingAttendance) {
@@ -41,7 +44,7 @@ const markAttendance = async (req, res) => {
     // Create a new attendance record
     const newAttendance = new attendanceModel({
       userId,
-      todayDate: new Date().setHours(0, 0, 0, 0),
+      todayDate,
       status: "present",
     });
 
@@ -57,7 +60,10 @@ const markAttendance = async (req, res) => {
     console.log(user);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: USER_NOT_FOUND });
+      return res.status(404).json({
+        success: false,
+        message: USER_NOT_FOUND,
+      });
     }
 
     return res.status(201).json({
@@ -91,9 +97,10 @@ const getTodayAttendanceForAllUsers = async (req, res) => {
       todayAttendanceRecords,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
@@ -234,9 +241,13 @@ const getAttendanceByUserId = async (req, res) => {
 const updateAttendance = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { status, date } = req.body;
+    const { status, todayDate } = req.body;
 
-    const parsedDate = new Date(date);
+    const parsedDate = new Date(todayDate);
+    parsedDate.setHours(0, 0, 0, 0);
+
+    console.log(parsedDate);
+
     if (isNaN(parsedDate.getTime())) {
       return res.status(400).json({
         message: INVALID_DATE_FORMAT,
@@ -253,7 +264,7 @@ const updateAttendance = async (req, res) => {
     // Find the attendance record for the given user and date
     const attendance = await attendanceModel.findOne({
       userId,
-      todayDate: parsedDate.setHours(0, 0, 0, 0),
+      todayDate: parsedDate,
     });
 
     if (!attendance) {
