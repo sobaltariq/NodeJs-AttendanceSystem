@@ -24,6 +24,12 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Import and load the cron jobs
+require("./utils/tasks/resetPaidLeaves");
+require("./utils/tasks/resetMonthlyPoints");
+require("./utils/tasks/markAbsent");
+// const task = require("./utils/tasks/test");
+
 // Import routes
 const userRoutes = require("./api/routes/userRoutes");
 const profileRoutes = require("./api/routes/profileUpdateRoutes");
@@ -31,7 +37,7 @@ const attendanceRoutes = require("./api/routes/attendanceRoutes");
 // const leaveRequestRoutes = require("./api/routes/leaveRequestRoutes");
 // const notificationRoutes = require("./api/routes/notificationRoutes");
 // const noticeBoardRoutes = require("./api/routes/noticeBoardRoutes");
-// const employerOfTheMonthRoutes = require("./api/routes/employerOfTheMonthRoutes");
+const employerOfTheMonthRoutes = require("./api/routes/employerOfTheMonthRoutes");
 const feedbackRoutes = require("./api/routes/feedbackRoutes");
 // const chatRoutes = require("./api/routes/chatRoutes");
 
@@ -50,7 +56,7 @@ app.use("/attendance", attendanceRoutes);
 // app.use("/leave-requests", leaveRequestRoutes);
 // app.use("/notifications", notificationRoutes);
 // app.use("/notice-board", noticeBoardRoutes);
-// app.use("/employers-of-the-month", employerOfTheMonthRoutes);
+app.use("/employers-of-the-month", employerOfTheMonthRoutes);
 app.use("/feedback", feedbackRoutes);
 // app.use("/chats", chatRoutes);
 

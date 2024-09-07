@@ -15,7 +15,10 @@ const employerOfTheMonthSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-employerOfTheMonthSchema.index({ employeeId: 1, month: 1, year: 1 });
+employerOfTheMonthSchema.index(
+  { employeeId: 1, year: 1, month: 1 },
+  { unique: true }
+);
 
 // Middleware to increment the employee's count
 employerOfTheMonthSchema.post("save", async function (doc) {
@@ -25,6 +28,7 @@ employerOfTheMonthSchema.post("save", async function (doc) {
     });
   } catch (error) {
     console.error("Error updating employerOfTheMonthCount:", error);
+    throw new Error("Failed to increment employerOfTheMonthCount");
   }
 });
 

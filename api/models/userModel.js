@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     paidLeavesResetDate: {
       type: Date,
-      default: () => new Date().setMonth(0, 1), // Reset date to January 1st
+      default: () => new Date().setFullYear(new Date().getFullYear() + 1, 0, 1), // Default to next January 1st
     },
     lastLogin: { type: Date },
     attendanceHistory: [
@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "PendingUpdate",
     },
+    monthlyPoints: { type: Number, default: 0 },
     hireDate: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
@@ -98,20 +99,6 @@ userSchema.methods.comparePassword = async function (password) {
 // Middleware to update timestamps
 userSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
-  next();
-});
-
-// Middleware to reset paid leaves count at the beginning of the year
-userSchema.pre("save", function (next) {
-  const now = new Date();
-  if (now > this.paidLeavesResetDate) {
-    this.paidLeavesTaken = 0;
-    this.paidLeavesResetDate = new Date().setFullYear(
-      now.getFullYear() + 1,
-      0,
-      1
-    ); // Next January 1st
-  }
   next();
 });
 

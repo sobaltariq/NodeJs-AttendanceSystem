@@ -14,7 +14,7 @@ const attendanceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["present", "absent", "late", "early, leave"],
+      enum: ["present", "absent", "late", "early", "leave"],
       required: true,
     },
     checkInTime: { type: Date, default: Date.now },
@@ -74,22 +74,70 @@ attendanceSchema.pre("save", async function (next) {
 });
 
 // Virtual field to calculate attendance for the current month
-attendanceSchema.virtual("currentMonthAttendance").get(function () {
+// attendanceSchema.virtual("currentMonthAttendance").get(function () {
+//   const startOfMonth = new Date(
+//     this.todayDate.getFullYear(),
+//     this.todayDate.getMonth(),
+//     1
+//   );
+//   const endOfMonth = new Date(
+//     this.todayDate.getFullYear(),
+//     this.todayDate.getMonth() + 1,
+//     0
+//   );
+
+//   return mongoose.model("Attendance").countDocuments({
+//     userId: this.userId,
+//     todayDate: { $gte: startOfMonth, $lt: endOfMonth },
+//   });
+// });
+attendanceSchema.statics.getCurrentMonthAttendance = function (userId) {
   const startOfMonth = new Date(
-    this.todayDate.getFullYear(),
-    this.todayDate.getMonth(),
+    new Date().getFullYear(),
+    new Date().getMonth(),
     1
   );
   const endOfMonth = new Date(
-    this.todayDate.getFullYear(),
-    this.todayDate.getMonth() + 1,
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
     0
   );
 
-  return mongoose.model("Attendance").countDocuments({
-    userId: this.userId,
+  return this.countDocuments({
+    userId: userId,
     todayDate: { $gte: startOfMonth, $lt: endOfMonth },
   });
+};
+
+// Method to adjust points based on attendance status
+attendanceSchema.post("save", async function () {
+  const User = mongoose.model("User");
+  let pointsChange = 0;
+
+  switch (this.status) {
+    case "absent":
+      pointsChange = -5;
+      break;
+    case "leave":
+      pointsChange = -3;
+      break;
+    case "present":
+    case "early":
+      pointsChange = 1;
+      break;
+    case "late":
+      pointsChange = -1;
+      break;
+    default:
+      pointsChange = 0;
+  }
+  try {
+    await User.findByIdAndUpdate(this.userId, {
+      $inc: { monthlyPoints: pointsChange },
+    });
+  } catch (error) {
+    console.error("Error updating user points:", error);
+  }
 });
 
 module.exports = mongoose.model("Attendance", attendanceSchema);
