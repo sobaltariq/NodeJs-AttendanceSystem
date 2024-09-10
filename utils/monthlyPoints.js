@@ -30,7 +30,7 @@ async function updateEmployeeOfTheMonth() {
   const topUser = await userModel.findOne().sort({ monthlyPoints: -1 }).exec();
 
   if (topUser) {
-    const newAward = new EmployerOfTheMonth({
+    const newAward = new EmployeeOfTheMonth({
       employeeId: topUser._id,
       month: new Date().toLocaleString("default", { month: "long" }),
       year: new Date().getFullYear(),

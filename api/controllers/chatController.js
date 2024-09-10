@@ -8,7 +8,7 @@ const getChatHistory = async (req, res) => {
     const chatFound = await chatModel.findOne({ application: appId });
     // .populate("Application");
     //   .populate("seeker")
-    //   .populate("employer");
+    //   .populate("employee");
 
     if (!chatFound) {
       return res.status(404).json({

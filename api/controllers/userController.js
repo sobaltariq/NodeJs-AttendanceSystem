@@ -291,7 +291,31 @@ const adminUpdateUserById = async (req, res) => {
     res.status(400).json({ error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
-// $$$$$$$$$$$$$$$
+
+const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+    const { id } = req.params;
+
+    const user = await userModel.findById(id).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: USER_NOT_FOUND });
+    }
+
+    // Check if the password is correct
+    const passwordMatch = await user.comparePassword(oldPassword);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: INVALID_PASSWORD });
+    }
+
+    // Hash the new password
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json({ message: PASSWORD_CHANGED_SUCCESSFULLY });
+  } catch (error) {
+    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
+  }
+};
 
 // Get all users
 const adminGetAllUsers = async (req, res) => {
@@ -324,31 +348,6 @@ const adminGetAllUsers = async (req, res) => {
     });
 
     // const usersFound = await userModel.find().select("-password -jobTitle");
-  } catch (error) {
-    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
-  }
-};
-
-const changePassword = async (req, res) => {
-  try {
-    const { oldPassword, newPassword, confirmPassword } = req.body;
-    const { id } = req.params;
-
-    const user = await userModel.findById(id).select("+password");
-    if (!user) {
-      return res.status(404).json({ message: USER_NOT_FOUND });
-    }
-
-    // Check if the password is correct
-    const passwordMatch = await user.comparePassword(oldPassword);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: INVALID_PASSWORD });
-    }
-
-    // Hash the new password
-    user.password = newPassword;
-    await user.save();
-    res.status(200).json({ message: PASSWORD_CHANGED_SUCCESSFULLY });
   } catch (error) {
     res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
   }

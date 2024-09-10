@@ -51,6 +51,14 @@ module.exports = {
   FEEDBACK_ALREADY_UPDATED: "Feedback already updated",
   FEEDBACK_DELETED_SUCCESSFULLY: "Feedback deleted successfully",
 
+  // EmployeeOfTheMonth-related errors
+  EMPLOYEE_OF_THE_MONTH_NOT_FOUND: "Employee of the Month not found",
+  DUPLICATE_Employee_OF_THE_MONTH:
+    "Duplicate Employee of the Month entry for the same month and year",
+  INVALID_Employee_OF_THE_MONTH_STATUS: "Invalid Employee of the Month status",
+  EMPLOYEE_OF_THE_MONTH_CREATED_SUCCESSFULLY:
+    "Employee of the Month created successfully",
+
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
   // Product-related errors
@@ -78,7 +86,4 @@ module.exports = {
   // Feedback-related errors
   //   FEEDBACK_NOT_FOUND: "Feedback not found",
   //   INVALID_FEEDBACK_TYPE: "Invalid feedback type",
-  // EmployerOfTheMonth-related errors
-  //   EMPLOYER_OF_THE_MONTH_NOT_FOUND: "Employer of the Month record not found",
-  //   DUPLICATE_EMPLOYER_OF_THE_MONTH: "Duplicate Employer of the Month entry for the same month and year",
 };

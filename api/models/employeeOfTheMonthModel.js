@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 
-const employerOfTheMonthSchema = new mongoose.Schema(
+const employeeOfTheMonthSchema = new mongoose.Schema(
   {
     employeeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+    username: { type: String, required: true },
     month: { type: String, required: true },
     year: { type: Number, required: true },
     reason: { type: String },
@@ -15,21 +16,21 @@ const employerOfTheMonthSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-employerOfTheMonthSchema.index(
+employeeOfTheMonthSchema.index(
   { employeeId: 1, year: 1, month: 1 },
   { unique: true }
 );
 
 // Middleware to increment the employee's count
-employerOfTheMonthSchema.post("save", async function (doc) {
+employeeOfTheMonthSchema.post("save", async function (doc) {
   try {
     await mongoose.model("User").findByIdAndUpdate(doc.employeeId, {
-      $inc: { employerOfTheMonthCount: 1 },
+      $inc: { employeeOfTheMonthCount: 1 },
     });
   } catch (error) {
-    console.error("Error updating employerOfTheMonthCount:", error);
-    throw new Error("Failed to increment employerOfTheMonthCount");
+    console.error("Error updating employeeOfTheMonthCount:", error);
+    throw new Error("Failed to increment employeeOfTheMonthCount");
   }
 });
 
-module.exports = mongoose.model("EmployerOfTheMonth", employerOfTheMonthSchema);
+module.exports = mongoose.model("EmployeeOfTheMonth", employeeOfTheMonthSchema);

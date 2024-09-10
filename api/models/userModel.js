@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    username: { type: String, unique: true },
     email: {
       type: String,
       required: true,
@@ -48,12 +49,12 @@ const userSchema = new mongoose.Schema(
     notifications: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Notification" },
     ],
-    employerOfTheMonthCount: { type: Number, default: 0 },
+    employeeOfTheMonthCount: { type: Number, default: 0 },
+    monthlyPoints: { type: Number, default: 0 },
     pendingUpdate: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PendingUpdate",
     },
-    monthlyPoints: { type: Number, default: 0 },
     hireDate: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
@@ -99,6 +100,33 @@ userSchema.methods.comparePassword = async function (password) {
 // Middleware to update timestamps
 userSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
+  next();
+});
+
+// Helper function to generate a unique username based on the user's name
+async function generateUsername(name) {
+  const baseUsername = name.toLowerCase().replace(/\s+/g, ""); // Remove spaces and lowercase
+  let username = baseUsername;
+  let count = 1;
+
+  // Check for uniqueness and append numbers if necessary
+  while (await mongoose.model("User").findOne({ username })) {
+    username = `${baseUsername}${count}`;
+    count++;
+  }
+
+  return username;
+}
+
+// Middleware to assign the username only when creating a new user
+userSchema.pre("save", async function (next) {
+  if (this.isNew && !this.username) {
+    try {
+      this.username = await generateUsername(this.name);
+    } catch (error) {
+      return next(error);
+    }
+  }
   next();
 });
 

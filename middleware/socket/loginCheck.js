@@ -4,7 +4,7 @@ const jobPostingModel = require("../models/jobPostingModel");
 const chatModel = require("../models/chatModel");
 const { application } = require("express");
 const jobSeekerModel = require("../models/jobSeekerModel");
-const employerModel = require("../models/employerModel");
+const employeeModel = require("../models/employeeModel");
 
 const verifyWSToken = (socket, next) => {
   // postman

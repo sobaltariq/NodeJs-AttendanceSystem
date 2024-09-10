@@ -37,7 +37,7 @@ const attendanceRoutes = require("./api/routes/attendanceRoutes");
 // const leaveRequestRoutes = require("./api/routes/leaveRequestRoutes");
 // const notificationRoutes = require("./api/routes/notificationRoutes");
 // const noticeBoardRoutes = require("./api/routes/noticeBoardRoutes");
-const employerOfTheMonthRoutes = require("./api/routes/employerOfTheMonthRoutes");
+const employeeOfTheMonthRoutes = require("./api/routes/employeeOfTheMonthRoutes");
 const feedbackRoutes = require("./api/routes/feedbackRoutes");
 // const chatRoutes = require("./api/routes/chatRoutes");
 
@@ -56,7 +56,7 @@ app.use("/attendance", attendanceRoutes);
 // app.use("/leave-requests", leaveRequestRoutes);
 // app.use("/notifications", notificationRoutes);
 // app.use("/notice-board", noticeBoardRoutes);
-app.use("/employers-of-the-month", employerOfTheMonthRoutes);
+app.use("/employee-of-the-month", employeeOfTheMonthRoutes);
 app.use("/feedback", feedbackRoutes);
 // app.use("/chats", chatRoutes);
 
