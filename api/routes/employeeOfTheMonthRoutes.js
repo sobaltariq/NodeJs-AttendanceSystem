@@ -27,6 +27,12 @@ router.post(
   validateRequest,
   setEmployeeOfTheMonth
 );
-router.put("/:id", verifyLoginToken, checkAdminRole, updateEmployeeOfTheMonth);
+router.patch(
+  // Employee Of The Month id
+  "/:id",
+  verifyLoginToken,
+  checkAdminRole,
+  updateEmployeeOfTheMonth
+);
 
 module.exports = router;

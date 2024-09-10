@@ -7,6 +7,7 @@ module.exports = {
   FORBIDDEN: "Forbidden",
   UNAUTHORIZED_ACCESS: "You do not have permission to access this resource.",
   INVALID_DATE_FORMAT: "Invalid date format",
+  NO_FIELDS_TO_UPDATE: "No fields to update",
 
   // ##### User-related errors #####
   USER_NOT_FOUND: "User not found",
@@ -21,7 +22,6 @@ module.exports = {
   LOGIN_SUCCESS: "Login successful.",
   REGISTRATION_SUCCESS: "Registration successfully",
   LOGOUT_SUCCESS: "Logged out successfully.",
-  NO_FIELDS_TO_UPDATE: "No fields to update",
   UPDATED_PROFILE_PICTURE_SUCCESSFULLYl: "Profile picture updated successfully",
   UPDATE_REQUEST_SENT_SUCCESSFULLY: "Update request sent successfully",
   REQUEST_ALREADY_PENDING: "Request already pending",
@@ -58,6 +58,10 @@ module.exports = {
   INVALID_Employee_OF_THE_MONTH_STATUS: "Invalid Employee of the Month status",
   EMPLOYEE_OF_THE_MONTH_CREATED_SUCCESSFULLY:
     "Employee of the Month created successfully",
+  EMPLOYEE_OF_THE_MONTH_ALREADY_EXIST:
+    "Employee of the month already exists for this month",
+  EMPLOYEE_OF_THE_MONTH_UPDATED_SUCCESSFULLY:
+    "Employee of the Month updated successfully",
 
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
