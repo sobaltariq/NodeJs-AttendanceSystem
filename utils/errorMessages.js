@@ -51,7 +51,7 @@ module.exports = {
   FEEDBACK_ALREADY_UPDATED: "Feedback already updated",
   FEEDBACK_DELETED_SUCCESSFULLY: "Feedback deleted successfully",
 
-  // EmployeeOfTheMonth-related errors
+  // Employee Of The Month related errors
   EMPLOYEE_OF_THE_MONTH_NOT_FOUND: "Employee of the Month not found",
   DUPLICATE_Employee_OF_THE_MONTH:
     "Duplicate Employee of the Month entry for the same month and year",
@@ -62,6 +62,16 @@ module.exports = {
     "Employee of the month already exists for this month",
   EMPLOYEE_OF_THE_MONTH_UPDATED_SUCCESSFULLY:
     "Employee of the Month updated successfully",
+
+  // Leave Request related errors
+  LEAVE_REQUEST_CREATED_SUCCESSFULLY: "Leave request created successfully",
+  LEAVE_REQUEST_UPDATED_SUCCESSFULLY: "Leave request updated successfully",
+  LEAVE_REQUEST_NOT_FOUND: "Leave request not found",
+  LEAVE_LIMIT_EXCEEDED: "Leave limit exceeded for the year",
+  INVALID_LEAVE_DATES: "Invalid leave dates provided",
+  LEAVE_BALANCE_INSUFFICIENT: "Insufficient leave balance",
+  LEAVE_REQUEST_DELETED_SUCCESSFULLY: "Leave request deleted successfully",
+  LEAVE_REQUEST_ALREADY_FOUND: "Leave request already found",
 
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
@@ -75,11 +85,6 @@ module.exports = {
   //   INVALID_ORDER_STATUS: "Invalid order status",
   //   INSUFFICIENT_FUNDS: "Insufficient funds",
   //   ORDER_CANCELLATION_NOT_ALLOWED: "Order cancellation not allowed at this stage",
-  // Leave-related errors
-  //   LEAVE_REQUEST_NOT_FOUND: "Leave request not found",
-  //   LEAVE_LIMIT_EXCEEDED: "Leave limit exceeded for the year",
-  //   INVALID_LEAVE_DATES: "Invalid leave dates provided",
-  //   LEAVE_BALANCE_INSUFFICIENT: "Insufficient leave balance",
 
   // Notification-related errors
   //   NOTIFICATION_NOT_FOUND: "Notification not found",

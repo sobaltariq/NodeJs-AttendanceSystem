@@ -23,10 +23,6 @@ const attendanceSchema = new mongoose.Schema(
       lat: { type: Number },
       lng: { type: Number },
     },
-    leaveRequestId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "LeaveRequest",
-    },
   },
   { timestamps: true }
 );
@@ -74,23 +70,6 @@ attendanceSchema.pre("save", async function (next) {
 });
 
 // Virtual field to calculate attendance for the current month
-// attendanceSchema.virtual("currentMonthAttendance").get(function () {
-//   const startOfMonth = new Date(
-//     this.todayDate.getFullYear(),
-//     this.todayDate.getMonth(),
-//     1
-//   );
-//   const endOfMonth = new Date(
-//     this.todayDate.getFullYear(),
-//     this.todayDate.getMonth() + 1,
-//     0
-//   );
-
-//   return mongoose.model("Attendance").countDocuments({
-//     userId: this.userId,
-//     todayDate: { $gte: startOfMonth, $lt: endOfMonth },
-//   });
-// });
 attendanceSchema.statics.getCurrentMonthAttendance = function (userId) {
   const startOfMonth = new Date(
     new Date().getFullYear(),

@@ -1,62 +1,223 @@
-const LeaveRequest = require("../models/leaveRequestModel");
+const {
+  USER_NOT_FOUND,
+  LEAVE_REQUEST_CREATED_SUCCESSFULLY,
+  INTERNAL_SERVER_ERROR,
+  LEAVE_REQUEST_NOT_FOUND,
+  LEAVE_REQUEST_UPDATED_SUCCESSFULLY,
+  LEAVE_REQUEST_DELETED_SUCCESSFULLY,
+  LEAVE_BALANCE_INSUFFICIENT,
+  LEAVE_REQUEST_ALREADY_FOUND,
+} = require("../../utils/errorMessages");
+const userModel = require("../models/userModel");
+const leaveRequestModel = require("../models/leaveRequestModel");
 
 // Create a new leave request
-exports.createLeaveRequest = async (req, res) => {
+const createLeaveRequest = async (req, res) => {
   try {
-    const leaveRequest = new LeaveRequest(req.body);
+    const { leaveType, startDate, endDate, reason } = req.body;
+
+    const userId = req.user.id;
+
+    // Check if the user exists
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: USER_NOT_FOUND,
+      });
+    }
+    // Calculate the number of leave days
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const daysRequested = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+    // Check if the user has enough leave balance
+    if (user.leaveBalance < daysRequested) {
+      return res.status(400).json({
+        success: false,
+        daysRequested: daysRequested,
+        message: LEAVE_BALANCE_INSUFFICIENT,
+      });
+    }
+
+    // Check for existing leave requests that overlap with the new request
+    const existingRequests = await leaveRequestModel.find({
+      userId,
+      startDate: { $lte: end },
+      endDate: { $gte: start },
+    });
+
+    if (existingRequests.length > 0) {
+      return res.status(400).json({
+        success: false,
+        daysRequested: daysRequested,
+        message: LEAVE_REQUEST_ALREADY_FOUND,
+      });
+    }
+
+    // Create the leave request
+    const leaveRequest = new leaveRequestModel({
+      userId,
+      leaveType,
+      startDate,
+      endDate,
+      reason,
+      daysRequested,
+    });
+
     await leaveRequest.save();
-    res.status(201).json(leaveRequest);
+
+    await userModel.findByIdAndUpdate(
+      userId,
+      { $push: { leaveRequests: leaveRequest._id } },
+      { new: true }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: LEAVE_REQUEST_CREATED_SUCCESSFULLY,
+      data: leaveRequest,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
-// Get all leave requests
-exports.getAllLeaveRequests = async (req, res) => {
+// Get a single leave request by ID
+const getLeaveRequestById = async (req, res) => {
   try {
-    const leaveRequests = await LeaveRequest.find();
-    res.json(leaveRequests);
+    const leaveRequestId = req.params.id;
+    const leaveRequest = await leaveRequestModel.findById(leaveRequestId);
+    // .populate("userId");
+
+    if (!leaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: LEAVE_REQUEST_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: leaveRequest,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
-
-// Get leave request by ID
-exports.getLeaveRequestById = async (req, res) => {
+const getLeaveRequestByUser = async (req, res) => {
   try {
-    const leaveRequest = await LeaveRequest.findById(req.params.id);
-    if (!leaveRequest)
-      return res.status(404).json({ error: "Leave request not found" });
-    res.json(leaveRequest);
+    const userId = req.params.userId;
+    const user = await userModel.findById(userId).populate("leaveRequests");
+    // .populate("userId");
+
+    if (user.leaveRequests.length < 0) {
+      return res.status(404).json({
+        success: false,
+        message: LEAVE_REQUEST_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      total: user.leaveRequests.length,
+      data: user.leaveRequests,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
 // Update a leave request by ID
-exports.updateLeaveRequest = async (req, res) => {
+const updateLeaveRequest = async (req, res) => {
   try {
-    const leaveRequest = await LeaveRequest.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!leaveRequest)
-      return res.status(404).json({ error: "Leave request not found" });
-    res.json(leaveRequest);
+    const { leaveType, startDate, endDate, reason, isPaidLeave, status } =
+      req.body;
+    const updatedLeaveRequest = await leaveRequestModel
+      .findByIdAndUpdate(
+        req.params.id,
+        { leaveType, startDate, endDate, reason, isPaidLeave, status },
+        { new: true, runValidators: true }
+      )
+      .populate("userId");
+
+    if (!updatedLeaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: LEAVE_REQUEST_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: LEAVE_REQUEST_UPDATED_SUCCESSFULLY,
+      data: updatedLeaveRequest,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
 // Delete a leave request by ID
-exports.deleteLeaveRequest = async (req, res) => {
+const deleteLeaveRequest = async (req, res) => {
   try {
-    const leaveRequest = await LeaveRequest.findByIdAndDelete(req.params.id);
-    if (!leaveRequest)
-      return res.status(404).json({ error: "Leave request not found" });
-    res.json({ message: "Leave request deleted successfully" });
+    const leaveRequest = await leaveRequestModel.findByIdAndDelete(
+      req.params.id
+    );
+
+    if (!leaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: LEAVE_REQUEST_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: LEAVE_REQUEST_DELETED_SUCCESSFULLY,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
+};
+
+// Get all leave requests (Admin only)
+const getAllLeaveRequests = async (req, res) => {
+  try {
+    const leaveRequests = await leaveRequestModel.find().populate("userId");
+
+    res.status(200).json({
+      success: true,
+      data: leaveRequests,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+module.exports = {
+  createLeaveRequest,
+  getAllLeaveRequests,
+  getLeaveRequestById,
+  getLeaveRequestByUser,
+  updateLeaveRequest,
+  deleteLeaveRequest,
 };

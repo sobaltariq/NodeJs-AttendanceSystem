@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const appConst = require("../../utils/constants/constant");
 
 const userSchema = new mongoose.Schema(
   {
@@ -34,14 +35,14 @@ const userSchema = new mongoose.Schema(
     department: { type: String },
     officeLocation: { type: String },
     position: { type: String, default: "Internee" },
+    leaveRequests: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "LeaveRequest" },
+    ],
     paidLeavesTaken: {
       type: Number,
       default: 0,
     },
-    paidLeavesResetDate: {
-      type: Date,
-      default: () => new Date().setFullYear(new Date().getFullYear() + 1, 0, 1), // Default to next January 1st
-    },
+    leaveBalance: { type: Number, default: appConst._maxLeavesPerYear },
     lastLogin: { type: Date },
     attendanceHistory: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Attendance" },
