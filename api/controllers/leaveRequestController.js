@@ -7,6 +7,7 @@ const {
   LEAVE_REQUEST_DELETED_SUCCESSFULLY,
   LEAVE_BALANCE_INSUFFICIENT,
   LEAVE_REQUEST_ALREADY_FOUND,
+  STATUS_IS_REQUIRED,
 } = require("../../utils/errorMessages");
 const userModel = require("../models/userModel");
 const leaveRequestModel = require("../models/leaveRequestModel");
@@ -140,15 +141,22 @@ const getLeaveRequestByUser = async (req, res) => {
 // Update a leave request by ID
 const updateLeaveRequest = async (req, res) => {
   try {
-    const { leaveType, startDate, endDate, reason, isPaidLeave, status } =
-      req.body;
-    const updatedLeaveRequest = await leaveRequestModel
-      .findByIdAndUpdate(
-        req.params.id,
-        { leaveType, startDate, endDate, reason, isPaidLeave, status },
-        { new: true, runValidators: true }
-      )
-      .populate("userId");
+    const { status } = req.body;
+    const leaveRequestId = req.params.id;
+    const userId = req.user.id;
+    const leaveRequest = await leaveRequestModel.findById(leaveRequestId);
+    if (leaveRequest.status === status) {
+      return res.status(400).json({
+        success: false,
+        message: `Already ${status}`,
+      });
+    }
+
+    const updatedLeaveRequest = await leaveRequestModel.findByIdAndUpdate(
+      leaveRequestId,
+      { $set: { status, approvedBy: userId } },
+      { new: true }
+    );
 
     if (!updatedLeaveRequest) {
       return res.status(404).json({

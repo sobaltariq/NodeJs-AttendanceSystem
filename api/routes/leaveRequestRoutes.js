@@ -10,6 +10,7 @@ const {
 const {
   createLeaveRequestValidation,
   validateLeaveDates,
+  updateLeaveRequestValidation,
 } = require("../../validator/leaveRequestValidations");
 const validateRequest = require("../../middleware/express/validateRequestMiddleware");
 const {
@@ -31,7 +32,14 @@ router.post(
 router.get("/", verifyLoginToken, checkAdminRole, getAllLeaveRequests);
 router.get("/:id", verifyLoginToken, getLeaveRequestById);
 router.get("/me/:userId", verifyLoginToken, getLeaveRequestByUser);
-router.put("/:id", updateLeaveRequest);
+router.patch(
+  "/:id",
+  updateLeaveRequestValidation(),
+  validateRequest,
+  verifyLoginToken,
+  checkAdminRole,
+  updateLeaveRequest
+);
 router.delete("/:id", deleteLeaveRequest);
 
 module.exports = router;

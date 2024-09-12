@@ -21,20 +21,15 @@ const createLeaveRequestValidation = [
 ];
 
 // Validation rules for updating a leave request
-const updateLeaveRequestValidation = [
-  param("id").isMongoId().withMessage("Invalid leave request ID"),
-  body("leaveType")
-    .optional()
-    .isIn(["sick", "casual", "personal"])
-    .withMessage("Invalid leave type"),
-  body("startDate").optional().isISO8601().withMessage("Invalid start date"),
-  body("endDate").optional().isISO8601().withMessage("Invalid end date"),
-  body("reason").optional().isString().withMessage("Reason must be a string"),
-  body("status")
-    .optional()
-    .isIn(["pending", "approved", "rejected"])
-    .withMessage("Invalid status"),
-];
+const updateLeaveRequestValidation = () => {
+  return [
+    body("status")
+      .notEmpty()
+      .withMessage("status is required")
+      .isIn(["pending", "approved", "rejected"])
+      .withMessage("Invalid status"),
+  ];
+};
 
 const validateLeaveDates = (req, res, next) => {
   const { startDate, endDate } = req.body;

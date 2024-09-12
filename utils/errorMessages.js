@@ -72,6 +72,7 @@ module.exports = {
   LEAVE_BALANCE_INSUFFICIENT: "Insufficient leave balance",
   LEAVE_REQUEST_DELETED_SUCCESSFULLY: "Leave request deleted successfully",
   LEAVE_REQUEST_ALREADY_FOUND: "Leave request already found",
+  STATUS_IS_REQUIRED: "Status is required",
 
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
