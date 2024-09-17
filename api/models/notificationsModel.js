@@ -9,9 +9,13 @@ const notificationSchema = new mongoose.Schema(
       index: true,
     },
     message: { type: String, required: true },
-    type: { type: String, enum: ["Reminder", "Alert"], required: true },
+    type: { type: String, enum: ["info", "warning", "alert"], default: "info" },
+    status: {
+      type: String,
+      enum: ["unread", "read"],
+      default: "unread",
+    },
     dateSent: { type: Date, default: Date.now },
-    read: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

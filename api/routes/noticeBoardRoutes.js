@@ -1,12 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const noticeBoardController = require("../controllers/noticeBoardController");
+const {
+  createNotice,
+  getAllNotices,
+  updateNotice,
+  deleteNotice,
+} = require("../controllers/noticeBoardController");
+const { checkAdminRole } = require("../../middleware/express/userTypeCheck");
+const {
+  verifyLoginToken,
+} = require("../../middleware/express/verifyLoginToken");
+const {
+  createNoticeValidationRules,
+  updateNoticeValidationRules,
+} = require("../../validator/noticeValidations");
+const validateRequest = require("../../middleware/express/validateRequestMiddleware");
 
 // Notice routes
-router.post("/", noticeBoardController.createNotice);
-router.get("/", noticeBoardController.getAllNotices);
-router.get("/:id", noticeBoardController.getNoticeById);
-router.put("/:id", noticeBoardController.updateNotice);
-router.delete("/:id", noticeBoardController.deleteNotice);
+router.post(
+  "/",
+  verifyLoginToken,
+  checkAdminRole,
+  createNoticeValidationRules(),
+  validateRequest,
+  createNotice
+);
+router.get("/", verifyLoginToken, getAllNotices);
+router.patch(
+  "/:id",
+  verifyLoginToken,
+  checkAdminRole,
+  updateNoticeValidationRules(),
+  validateRequest,
+  updateNotice
+);
+router.delete("/:id", verifyLoginToken, checkAdminRole, deleteNotice);
 
 module.exports = router;

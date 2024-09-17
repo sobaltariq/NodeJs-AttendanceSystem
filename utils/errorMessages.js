@@ -74,6 +74,14 @@ module.exports = {
   LEAVE_REQUEST_ALREADY_FOUND: "Leave request already found",
   STATUS_IS_REQUIRED: "Status is required",
 
+  // NoticeBoard-related errors
+  NOTICE_NOT_FOUND: "Notice not found",
+  NOTICE_CREATED_SUCCESSFULLY: "Notice created successfully",
+  NOTICE_ALREADY_DELETED: "Notice already deleted",
+  NOTICE_DELETED_SUCCESSFULLY: "Notice deleted successfully",
+  NOTICE_UPDATED_SUCCESSFULLY: "Notice updated successfully",
+  INVALID_NOTICE_DETAILS: "Invalid notice details provided",
+
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
   // Product-related errors
@@ -90,9 +98,7 @@ module.exports = {
   // Notification-related errors
   //   NOTIFICATION_NOT_FOUND: "Notification not found",
   //   INVALID_NOTIFICATION_TYPE: "Invalid notification type",
-  // NoticeBoard-related errors
-  //   NOTICE_NOT_FOUND: "Notice not found",
-  //   INVALID_NOTICE_DETAILS: "Invalid notice details provided",
+
   // Feedback-related errors
   //   FEEDBACK_NOT_FOUND: "Feedback not found",
   //   INVALID_FEEDBACK_TYPE: "Invalid feedback type",

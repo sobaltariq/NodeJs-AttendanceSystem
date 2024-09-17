@@ -14,7 +14,6 @@ const noticeBoardSchema = new mongoose.Schema(
       enum: ["Reminder", "Alert", "Notice"],
       required: true,
     },
-    visibleTo: [{ type: String }],
     createdAt: { type: Date, default: Date.now },
     expiryDate: { type: Date, default: Date.now },
   },
