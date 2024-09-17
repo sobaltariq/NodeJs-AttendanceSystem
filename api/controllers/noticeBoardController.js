@@ -3,6 +3,7 @@ const {
   NOTICE_DELETED_SUCCESSFULLY,
   INTERNAL_SERVER_ERROR,
   NOTICE_CREATED_SUCCESSFULLY,
+  NOTICE_UPDATED_SUCCESSFULLY,
 } = require("../../utils/errorMessages");
 const noticeBoardModel = require("../models/noticeBoardModel");
 
@@ -54,13 +55,36 @@ const getAllNotices = async (req, res) => {
 // Update a notice by ID
 const updateNotice = async (req, res) => {
   try {
-    const notice = await Notice.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+    const { title, content, type } = req.body;
+    const userId = req.user.id;
+    const noticeId = req.params.id;
+    console.log(req.body, userId, noticeId);
+
+    const notice = await noticeBoardModel.findById(noticeId);
+    if (!notice) {
+      return res.status(404).json({
+        success: false,
+        error: NOTICE_NOT_FOUND,
+      });
+    }
+
+    // Update the notice
+    notice.title = title;
+    notice.content = content;
+    notice.type = type;
+
+    await notice.save();
+
+    res.status(200).json({
+      success: true,
+      message: NOTICE_UPDATED_SUCCESSFULLY,
+      data: notice,
     });
-    if (!notice) return res.status(404).json({ error: "Notice not found" });
-    res.json(notice);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 

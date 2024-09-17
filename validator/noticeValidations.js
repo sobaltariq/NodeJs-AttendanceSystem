@@ -26,19 +26,16 @@ const createNoticeValidationRules = () => {
 const updateNoticeValidationRules = () => {
   return [
     body("title")
-      .optional()
       .isString()
       .isLength({ min: 5 })
       .withMessage("Title must be at least 5 characters long.")
       .trim(),
     body("content")
-      .optional()
       .isString()
       .isLength({ min: 10 })
       .withMessage("Content must be at least 10 characters long.")
       .trim(),
     body("type")
-      .optional()
       .isIn(["Reminder", "Alert", "Notice"])
       .withMessage("Type must be one of Reminder, Alert, or Notice."),
   ];
