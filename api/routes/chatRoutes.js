@@ -1,12 +1,18 @@
 const express = require("express");
-const chatController = require("../controllers/chatController");
+const {
+  createChat,
+  getChatHistory,
+  getAllUsers,
+} = require("../controllers/chatController");
+const {
+  verifyLoginToken,
+} = require("../../middleware/express/verifyLoginToken");
 
 // Chat routes
 const router = express.Router();
-router.post("/", chatController.createChat);
-router.get("/", chatController.getAllChats);
-router.get("/:id", chatController.getChatById);
-router.put("/:id", chatController.updateChat);
-router.delete("/:id", chatController.deleteChat);
+
+router.get("/:chatId", verifyLoginToken, getChatHistory);
+router.get("/users/:myId", verifyLoginToken, getAllUsers);
+router.post("/create", createChat);
 
 module.exports = router;

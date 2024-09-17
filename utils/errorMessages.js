@@ -82,6 +82,12 @@ module.exports = {
   NOTICE_UPDATED_SUCCESSFULLY: "Notice updated successfully",
   INVALID_NOTICE_DETAILS: "Invalid notice details provided",
 
+  // Chat -related errors
+  CHAT_NOT_FOUND: "Chat not found",
+  CHAT_CREATED_SUCCESSFULLY: "Chat created successfully",
+  CHAT_ALREADY_DELETED: "Chat already deleted",
+  CHAT_DELETED_SUCCESSFULLY: "Chat deleted successfully",
+
   //   INVALID_CREDENTIALS: "Invalid credentials",
   //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
   // Product-related errors

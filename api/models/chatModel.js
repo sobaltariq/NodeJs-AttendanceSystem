@@ -17,23 +17,41 @@ const chatMessageSchema = new mongoose.Schema({
   },
 });
 
+// Main chat schema to support both one-on-one and group chats
 const chatSchema = new mongoose.Schema(
   {
-    senderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    chatType: {
+      type: String,
+      enum: ["private", "group"],
+      default: "private",
     },
-    receiverId: {
+    groupName: {
+      type: String,
+      trim: true,
+      required: function () {
+        return this.chatType === "group";
+      },
+    },
+    participants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
+    groupAdmin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: function () {
+        return this.chatType === "group";
+      },
     },
     messages: [chatMessageSchema],
   },
   { timestamps: true }
 );
 
-chatSchema.index({ senderId: 1, receiverId: 1, "messages.timestamp": 1 });
+// Indexes
+chatSchema.index({ chatType: 1 });
 
 module.exports = mongoose.model("Chat", chatSchema);

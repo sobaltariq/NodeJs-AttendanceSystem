@@ -39,7 +39,7 @@ const leaveRequestRoutes = require("./api/routes/leaveRequestRoutes");
 const noticeBoardRoutes = require("./api/routes/noticeBoardRoutes");
 const employeeOfTheMonthRoutes = require("./api/routes/employeeOfTheMonthRoutes");
 const feedbackRoutes = require("./api/routes/feedbackRoutes");
-// const chatRoutes = require("./api/routes/chatRoutes");
+const chatRoutes = require("./api/routes/chatRoutes");
 
 // use routes
 app.get("/", (req, res) => {
@@ -58,7 +58,7 @@ app.use("/leave-requests", leaveRequestRoutes);
 app.use("/notice-board", noticeBoardRoutes);
 app.use("/employee-of-the-month", employeeOfTheMonthRoutes);
 app.use("/feedback", feedbackRoutes);
-// app.use("/chats", chatRoutes);
+app.use("/chats", chatRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

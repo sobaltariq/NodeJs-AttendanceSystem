@@ -43,7 +43,7 @@ const createFeedback = async (req, res) => {
       feedback: feedback._id,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       error: error.message || INTERNAL_SERVER_ERROR,
     });
@@ -112,7 +112,7 @@ const updateFeedback = async (req, res) => {
       message: FEEDBACK_UPDATED_SUCCESSFULLY,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       error: error.message || INTERNAL_SERVER_ERROR,
     });
@@ -136,7 +136,7 @@ const deleteFeedback = async (req, res) => {
       message: FEEDBACK_DELETED_SUCCESSFULLY,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       error: error.message || INTERNAL_SERVER_ERROR,
     });
