@@ -17,7 +17,7 @@ const chatMessageSchema = new mongoose.Schema({
   },
 });
 
-// Main chat schema to support both one-on-one and group chats
+// Main chat schema
 const chatSchema = new mongoose.Schema(
   {
     chatType: {
@@ -50,8 +50,5 @@ const chatSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Indexes
-chatSchema.index({ chatType: 1 });
 
 module.exports = mongoose.model("Chat", chatSchema);
