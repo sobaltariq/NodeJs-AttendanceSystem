@@ -13,6 +13,6 @@ const router = express.Router();
 
 router.get("/:chatId", verifyLoginToken, getChatHistory);
 router.get("/users/:myId", verifyLoginToken, getAllUsers);
-router.post("/create", createChat);
+router.patch("/create", createChat);
 
 module.exports = router;

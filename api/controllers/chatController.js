@@ -1,52 +1,24 @@
 const chatModel = require("../models/chatModel");
+const userModel = require("../models/userModel");
 
 const createChat = async (req, res) => {
+  const { participants, chatType, groupName, groupAdmin } = req.body;
+
   try {
-    const { chatType, participants, groupName, groupAdmin } = req.body;
-
-    // Validate participants
-    if (
-      (chatType === "private" && participants.length !== 2) ||
-      (chatType === "group" && participants.length < 2)
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          chatType === "private"
-            ? "Private chats must have exactly two participants."
-            : "Group chats must have at least two participants.",
-      });
-    }
-
-    // Check for unique participants in private chats
-    if (chatType === "private" && participants[0] === participants[1]) {
-      return res.status(400).json({
-        success: false,
-        message: "Participants in a private chat must be unique.",
-      });
-    }
-
-    // Create the new chat
     const newChat = new chatModel({
       chatType,
-      participants,
-      ...(chatType === "group" && { groupName, groupAdmin }),
+      groupName,
+      participants: {
+        userId: participants,
+      },
+      groupAdmin,
     });
 
     await newChat.save();
-
-    res.status(201).json({
-      success: true,
-      data: newChat,
-      message: "Chat created successfully.",
-    });
+    return res.status(201).json(newChat);
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create chat.",
-      error: error.message,
-    });
+    return res.status(500).json({ error });
   }
 };
 

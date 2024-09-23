@@ -1,23 +1,5 @@
 const mongoose = require("mongoose");
 
-const chatMessageSchema = new mongoose.Schema({
-  sender: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  content: {
-    type: String,
-    required: [true, "Message content is required"],
-    maxLength: [500, "Message cannot be more than 500 characters"],
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-// Main chat schema
 const chatSchema = new mongoose.Schema(
   {
     chatType: {
@@ -28,27 +10,39 @@ const chatSchema = new mongoose.Schema(
     groupName: {
       type: String,
       trim: true,
-      required: function () {
-        return this.chatType === "group";
-      },
     },
     participants: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        joinedAt: { type: Date, default: Date.now },
       },
     ],
     groupAdmin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: function () {
-        return this.chatType === "group";
-      },
     },
-    messages: [chatMessageSchema],
+    messages: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
   },
   { timestamps: true }
 );
+
+// Index to quickly find a chat by its participants (useful for private chats)
+chatSchema.index({
+  participants: 1,
+});
+
+// Optional: Create a text index for searching group names
+chatSchema.index({
+  groupName: "text",
+});
 
 module.exports = mongoose.model("Chat", chatSchema);
