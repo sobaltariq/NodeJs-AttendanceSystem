@@ -4,14 +4,14 @@ const userModel = require("../models/userModel");
 const createChat = async (req, res) => {
   const { participants, chatType, groupName, groupAdmin } = req.body;
 
+  console.log(req.body);
+
   try {
     const newChat = new chatModel({
       chatType,
-      groupName,
-      participants: {
-        userId: participants,
-      },
-      groupAdmin,
+      // groupName,
+      participants,
+      // groupAdmin,
     });
 
     await newChat.save();

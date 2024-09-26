@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
 
+const participantSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  joinedAt: { type: Date, default: Date.now },
+});
+
 const chatSchema = new mongoose.Schema(
   {
     chatType: {
@@ -10,39 +19,33 @@ const chatSchema = new mongoose.Schema(
     groupName: {
       type: String,
       trim: true,
+      required: function () {
+        return this.chatType === "group";
+      },
     },
     participants: [
       {
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        joinedAt: { type: Date, default: Date.now },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Participant",
+        unique: true, // Ensures no duplicate participants per chat
       },
     ],
     groupAdmin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    },
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
+      required: function () {
+        return this.chatType === "group";
       },
-    ],
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-// Index to quickly find a chat by its participants (useful for private chats)
-chatSchema.index({
-  participants: 1,
-});
+// Create a compound index on chatType and participants.userId for efficient querying
+chatSchema.index({ chatType: 1, "participants.userId": 1 });
 
-// Optional: Create a text index for searching group names
-chatSchema.index({
-  groupName: "text",
-});
+// Optional: Create a text index for searching group names (useful for search functionality)
+chatSchema.index({ groupName: "text" });
 
 module.exports = mongoose.model("Chat", chatSchema);
