@@ -1,4 +1,7 @@
 const { Server } = require("socket.io");
+const {
+  verifyWSLoginToken,
+} = require("../middleware/socket/verifyWSLoginToken");
 
 const initializeSocketServer = (server) => {
   const io = new Server(server, {
@@ -9,6 +12,9 @@ const initializeSocketServer = (server) => {
       credentials: true,
     },
   });
+
+  // Use the verifyWSToken middleware for WebSocket connections
+  io.use(verifyWSLoginToken);
 
   io.on("connection", (socket) => {
     console.log(`A user connected: ${socket.id}`);

@@ -26,6 +26,14 @@ const messageSchema = new mongoose.Schema({
     enum: ["sent", "delivered", "read"],
     default: "sent",
   },
+  deliveredAt: {
+    type: Date,
+    default: null,
+  },
+  readAt: {
+    type: Date,
+    default: null,
+  },
   timestamp: {
     type: Date,
     default: Date.now,
@@ -33,5 +41,18 @@ const messageSchema = new mongoose.Schema({
 });
 
 messageSchema.index({ chatId: 1, timestamp: -1 }); // Index for recent messages
+
+// Middleware to update `deliveredAt` or `readAt` timestamps based on status
+messageSchema.pre("save", function (next) {
+  if (this.isModified("status")) {
+    if (this.status === "delivered") {
+      this.deliveredAt = new Date();
+    }
+    if (this.status === "read") {
+      this.readAt = new Date();
+    }
+  }
+  next();
+});
 
 module.exports = mongoose.model("Message", messageSchema);
