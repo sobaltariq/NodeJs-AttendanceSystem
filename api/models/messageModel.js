@@ -16,11 +16,22 @@ const messageSchema = new mongoose.Schema({
     required: true,
     maxLength: [500, "Message cannot be more than 500 characters"],
   },
+  attachments: [
+    {
+      type: String, // Store URLs or paths to attachments
+    },
+  ],
+  status: {
+    type: String,
+    enum: ["sent", "delivered", "read"],
+    default: "sent",
+  },
   timestamp: {
     type: Date,
     default: Date.now,
   },
 });
 
-const Message = mongoose.model("Message", messageSchema);
-module.exports = Message;
+messageSchema.index({ chatId: 1, timestamp: -1 }); // Index for recent messages
+
+module.exports = mongoose.model("Message", messageSchema);
