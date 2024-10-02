@@ -13,6 +13,7 @@ const chatSchema = new mongoose.Schema(
       required: function () {
         return this.chatType === "group";
       },
+      unique: true,
     },
     groupAdmin: {
       type: mongoose.Schema.Types.ObjectId,

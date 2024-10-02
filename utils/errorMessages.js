@@ -88,24 +88,21 @@ module.exports = {
   CHAT_ALREADY_DELETED: "Chat already deleted",
   CHAT_DELETED_SUCCESSFULLY: "Chat deleted successfully",
 
-  //   INVALID_CREDENTIALS: "Invalid credentials",
-  //   PASSWORD_TOO_WEAK: "Password must be at least 8 characters long and include a mix of letters and numbers",
-  // Product-related errors
-  //   PRODUCT_NOT_FOUND: "Product not found",
-  //   PRODUCT_ALREADY_EXISTS: "Product already exists",
-  //   INSUFFICIENT_STOCK: "Insufficient stock",
-  //   INVALID_PRODUCT_DETAILS: "Invalid product details provided",
-  // Order-related errors
-  //   ORDER_NOT_FOUND: "Order not found",
-  //   INVALID_ORDER_STATUS: "Invalid order status",
-  //   INSUFFICIENT_FUNDS: "Insufficient funds",
-  //   ORDER_CANCELLATION_NOT_ALLOWED: "Order cancellation not allowed at this stage",
+  // ########## Socket-related errors Start ##########
+  SOCKET_CONNECTION_ERROR: "Socket connection error",
+  SOCKET_DISCONNECTED: "Socket disconnected",
+
+  // Chat-related errors
+  CHAT_MESSAGE_NOT_FOUND: "Chat message not found",
+  CHAT_MESSAGE_DELETED_SUCCESSFULLY: "Chat message deleted successfully",
+  INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM:
+    "Internal server error when joining room",
+
+  ONLY_ADMIN_CAN_CREATE_GROUP: "Only admins can create group chats",
+
+  // ########## Socket-related errors End ##########
 
   // Notification-related errors
   //   NOTIFICATION_NOT_FOUND: "Notification not found",
   //   INVALID_NOTIFICATION_TYPE: "Invalid notification type",
-
-  // Feedback-related errors
-  //   FEEDBACK_NOT_FOUND: "Feedback not found",
-  //   INVALID_FEEDBACK_TYPE: "Invalid feedback type",
 };
