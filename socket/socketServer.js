@@ -2,7 +2,7 @@ const { Server } = require("socket.io");
 const {
   verifyWSLoginToken,
 } = require("../middleware/socket/verifyWSLoginToken");
-const { joinRoomServices } = require("./event/joinRoomServices");
+const { joinRoomServices } = require("./services/joinRoomServices");
 const {
   INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM,
 } = require("../utils/errorMessages");
@@ -27,11 +27,45 @@ const initializeSocketServer = (server) => {
     socket.on("joinRoom", async ({ userId, chatType }) => {
       try {
         console.log("roomId", userId, chatType);
-        joinRoomServices(socket, userId, chatType, groupName, participantIds);
+        const chat = joinRoomServices(
+          socket,
+          userId,
+          chatType,
+          chatType === "group" ? groupName : undefined,
+          chatType === "group" ? participantIds : undefined
+        );
+        socket.join(chat._id); // Join the chat room
+        socket.emit("roomJoined", { chatId: chat._id, chatType }); // Emit to the client
       } catch (err) {
         console.error("Error handling joinRoom:", err.message);
         socket.emit("error", INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM);
       }
+    });
+
+    // Event for sending a message
+    socket.on("sendMessage", async ({ chatId, message }) => {
+      try {
+        const savedMessage = await chatService.saveMessage(
+          chatId,
+          socket.user.id,
+          message
+        );
+        io.to(chatId).emit("messageReceived", {
+          chatId,
+          message: savedMessage,
+        });
+      } catch (error) {
+        socket.emit("error", "Error sending message.");
+      }
+    });
+
+    // Typing indicator
+    socket.on("typing", ({ chatId }) => {
+      socket.to(chatId).emit("typing", { userId: socket.user.id });
+    });
+
+    socket.on("stopTyping", ({ chatId }) => {
+      socket.to(chatId).emit("stopTyping", { userId: socket.user.id });
     });
 
     socket.on("error", (message) => {
