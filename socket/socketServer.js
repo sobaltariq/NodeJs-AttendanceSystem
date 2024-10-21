@@ -36,6 +36,7 @@ const initializeSocketServer = (server) => {
         );
         socket.join(chat._id); // Join the chat room
         socket.emit("roomJoined", { chatId: chat._id, chatType }); // Emit to the client
+        console.log(`Client ${socket.id} joined room: ${chat}`);
       } catch (err) {
         console.error("Error handling joinRoom:", err.message);
         socket.emit("error", INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM);
