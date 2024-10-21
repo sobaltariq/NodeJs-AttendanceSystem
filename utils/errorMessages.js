@@ -99,6 +99,11 @@ module.exports = {
     "Internal server error when joining room",
 
   ONLY_ADMIN_CAN_CREATE_GROUP: "Only admins can create group chats",
+  ONLY_ADMIN_CAN_DELETE_GROUP: "Only admins can delete group chats",
+  GROUP_NAME_EXISTS:
+    "Group name already exists. Please choose a different name.",
+  GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN:
+    "This group name is already taken by another admin. Please choose a different name.",
 
   // ########## Socket-related errors End ##########
 

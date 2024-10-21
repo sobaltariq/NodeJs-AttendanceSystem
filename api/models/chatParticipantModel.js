@@ -11,12 +11,12 @@ const participantSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  joinedAt: { type: Date, default: Date.now },
   role: {
     type: String,
     enum: ["admin", "member"],
     default: "member",
   },
+  joinedAt: { type: Date, default: Date.now },
 });
 
 // Ensure uniqueness of user in a chat

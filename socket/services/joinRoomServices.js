@@ -1,6 +1,9 @@
 const chatModel = require("../../api/models/chatModel");
 const chatParticipantModel = require("../../api/models/chatParticipantModel");
-const { ONLY_ADMIN_CAN_CREATE_GROUP } = require("../../utils/errorMessages");
+const {
+  ONLY_ADMIN_CAN_CREATE_GROUP,
+  GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN,
+} = require("../../utils/errorMessages");
 
 const joinRoomServices = (
   socket,
@@ -21,10 +24,10 @@ const joinRoomServices = (
     if (user.role !== "admin") {
       console.log("Only admins can create group chats");
       socket.emit("error", ONLY_ADMIN_CAN_CREATE_GROUP);
-      return;
+      return { success: false, message: ONLY_ADMIN_CAN_CREATE_GROUP };
     }
 
-    const chat = createOrGetGroupChat(groupName, creatorId, participantIds);
+    const chat = createOrGetGroupChat(user, groupName, participantIds, socket);
     return chat;
   }
 };
@@ -67,7 +70,12 @@ const createOrGetPrivateChat = async (userId1, userId2) => {
   return chat;
 };
 
-const createOrGetGroupChat = async (groupName, creatorId, participantIds) => {
+const createOrGetGroupChat = async (
+  user,
+  groupName,
+  participantIds,
+  socket
+) => {
   const chat = await chatModel.findOne({
     chatType: "group",
     groupName,
@@ -78,25 +86,34 @@ const createOrGetGroupChat = async (groupName, creatorId, participantIds) => {
 
     const newChat = new chatModel({
       chatType: "group",
-      groupName: groupName,
-      groupAdmin: creatorId,
+      groupName,
+      groupAdmin: user.id,
       participants: participantIds,
     });
     await newChat.save();
 
-    await chatParticipantModel.create(
-      participantIds.map((userId) => ({
-        chatId: newChat._id,
-        userId: userId._id,
-        role: "member",
-        joinedAt: Date.now(),
-      }))
-    );
+    const newParticipant = participantIds.map((userId) => ({
+      chatId: newChat._id,
+      userId: userId,
+      role: "member",
+      joinedAt: Date.now(),
+    }));
+    await chatParticipantModel.create(newParticipant);
+
     console.log("New chat created.");
     return newChat;
   }
-  console.log("chat found");
+  if (chat.groupAdmin.toString() !== user.id) {
+    console.log(
+      "Group name is taken by another admin.",
+      chat.groupAdmin,
+      user.id
+    );
+    socket.emit("error", GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN);
+    return { success: false, message: GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN };
+  }
 
+  console.log("Group chat found, returning existing chat.");
   return chat;
 };
 
