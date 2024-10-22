@@ -104,6 +104,16 @@ module.exports = {
     "Group name already exists. Please choose a different name.",
   GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN:
     "This group name is already taken by another admin. Please choose a different name.",
+  GROUP_NAME_TAKEN_BY_ANOTHER_USER:
+    "This group name is already taken by another user.",
+  PRIVATE_CHAT_CREATED: "New private chat created",
+  PRIVATE_CHAT_ALREADY_EXIST: "Private chat already exists",
+  GROUP_CHAT_CREATED: "New group chat created",
+  GROUP_CHAT_ALREADY_EXIST: "Group chat already exists",
+  GROUP_CHAT_DELETED: "Group chat deleted",
+  GROUP_CHAT_UPDATED: "Group chat updated",
+  GROUP_CHAT_MEMBER_ADDED: "Group chat member added",
+  GROUP_CHAT_MEMBER_REMOVED: "Group chat member removed",
 
   // ########## Socket-related errors End ##########
 

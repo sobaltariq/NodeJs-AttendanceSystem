@@ -3,6 +3,10 @@ const chatParticipantModel = require("../../api/models/chatParticipantModel");
 const {
   ONLY_ADMIN_CAN_CREATE_GROUP,
   GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN,
+  PRIVATE_CHAT_CREATED,
+  PRIVATE_CHAT_ALREADY_EXIST,
+  GROUP_CHAT_CREATED,
+  GROUP_CHAT_ALREADY_EXIST,
 } = require("../../utils/errorMessages");
 
 const joinRoomServices = (
@@ -63,11 +67,12 @@ const createOrGetPrivateChat = async (userId1, userId2) => {
       },
     ]);
     console.log("New chat created.");
-    return newChat;
+
+    return { success: true, _id: newChat._id, message: PRIVATE_CHAT_CREATED };
   }
   console.log("chat found");
 
-  return chat;
+  return { success: true, _id: chat._id, message: PRIVATE_CHAT_ALREADY_EXIST };
 };
 
 const createOrGetGroupChat = async (
@@ -101,7 +106,7 @@ const createOrGetGroupChat = async (
     await chatParticipantModel.create(newParticipant);
 
     console.log("New chat created.");
-    return newChat;
+    return { success: true, _id: newChat._id, message: GROUP_CHAT_CREATED };
   }
   if (chat.groupAdmin.toString() !== user.id) {
     console.log(
@@ -114,7 +119,7 @@ const createOrGetGroupChat = async (
   }
 
   console.log("Group chat found, returning existing chat.");
-  return chat;
+  return { success: true, _id: chat._id, message: GROUP_CHAT_ALREADY_EXIST };
 };
 
 module.exports = {

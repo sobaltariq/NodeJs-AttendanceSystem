@@ -6,6 +6,7 @@ const { joinRoomServices } = require("./services/joinRoomServices");
 const {
   INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM,
 } = require("../utils/errorMessages");
+const { joinRoomHandler } = require("./handler/joinRoomHandler");
 
 const initializeSocketServer = (server) => {
   const io = new Server(server, {
@@ -24,31 +25,7 @@ const initializeSocketServer = (server) => {
     console.log(`A user connected: ${socket.id}`);
 
     // Join a specific chat room when a user wants to join a chat
-    socket.on(
-      "joinRoom",
-      async ({ userId, chatType, groupName, participantIds }) => {
-        try {
-          console.log("roomId", userId, chatType, groupName, participantIds);
-          const chat = joinRoomServices(
-            socket,
-            userId,
-            chatType,
-            chatType === "group" ? groupName : undefined,
-            chatType === "group" ? participantIds : undefined
-          );
-          if (chat.success) {
-            socket.join(chat._id); // Join the chat room
-            socket.emit("roomJoined", { chatId: chat._id, chatType }); // Emit to the client
-            console.log(`Client ${socket.id} joined room: ${chat} ${chatType}`);
-          } else {
-            socket.emit("error", chat.message);
-          }
-        } catch (err) {
-          console.error("Error handling joinRoom:", err.message);
-          socket.emit("error", INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM);
-        }
-      }
-    );
+    socket.on("joinRoom", async (data) => joinRoomHandler(socket, data));
 
     // Event for sending a message
     socket.on("sendMessage", async ({ chatId, message }) => {
@@ -77,6 +54,10 @@ const initializeSocketServer = (server) => {
     });
 
     socket.on("error", (message) => {
+      console.error(`Error: ${message}`);
+    });
+
+    socket.on("message", (message) => {
       console.error(`Error: ${message}`);
     });
 
