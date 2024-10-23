@@ -35,6 +35,8 @@ const joinRoomHandler = async (
     );
 
     if (chat.success) {
+      console.log("joined room", chat._id);
+
       socket.join(chat._id);
       if (chatType === "group") {
         const groupAdminDetails = await chatModel.findById(chat._id);

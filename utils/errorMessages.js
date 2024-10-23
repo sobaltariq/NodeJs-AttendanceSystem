@@ -114,6 +114,9 @@ module.exports = {
   GROUP_CHAT_UPDATED: "Group chat updated",
   GROUP_CHAT_MEMBER_ADDED: "Group chat member added",
   GROUP_CHAT_MEMBER_REMOVED: "Group chat member removed",
+  CAN_NOT_SEND_MESSAGE_IN_THIS_ROOM:
+    "Access denied. Cannot send message to this room",
+  MESSAGE_IS_TOO_LONG: "Message cannot be more than 500 characters.",
 
   // ########## Socket-related errors End ##########
 

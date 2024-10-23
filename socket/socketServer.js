@@ -7,6 +7,7 @@ const {
   INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM,
 } = require("../utils/errorMessages");
 const { joinRoomHandler } = require("./handler/joinRoomHandler");
+const { messageHandler } = require("./handler/messageHandler");
 
 const initializeSocketServer = (server) => {
   const io = new Server(server, {
@@ -28,21 +29,7 @@ const initializeSocketServer = (server) => {
     socket.on("joinRoom", async (data) => joinRoomHandler(socket, data));
 
     // Event for sending a message
-    socket.on("sendMessage", async ({ chatId, message }) => {
-      try {
-        const savedMessage = await chatService.saveMessage(
-          chatId,
-          socket.user.id,
-          message
-        );
-        io.to(chatId).emit("messageReceived", {
-          chatId,
-          message: savedMessage,
-        });
-      } catch (error) {
-        socket.emit("error", "Error sending message.");
-      }
-    });
+    socket.on("sendMessage", async (data) => messageHandler(socket, data));
 
     // Typing indicator
     socket.on("typing", ({ chatId }) => {
