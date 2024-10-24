@@ -1,8 +1,7 @@
 const express = require("express");
 const {
-  createChat,
   getChatHistory,
-  getAllUsers,
+  getParticipants,
 } = require("../controllers/chatController");
 const {
   verifyLoginToken,
@@ -12,7 +11,6 @@ const {
 const router = express.Router();
 
 router.get("/:chatId", verifyLoginToken, getChatHistory);
-router.get("/users/:myId", verifyLoginToken, getAllUsers);
-router.patch("/create", createChat);
+router.get("/participants/:chatId", verifyLoginToken, getParticipants);
 
 module.exports = router;

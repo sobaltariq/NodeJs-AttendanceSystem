@@ -29,7 +29,7 @@ const initializeSocketServer = (server) => {
     socket.on("joinRoom", async (data) => joinRoomHandler(socket, data));
 
     // Event for sending a message
-    socket.on("sendMessage", async (data) => messageHandler(socket, data));
+    socket.on("sendMessage", async (data) => messageHandler(io, socket, data));
 
     // Typing indicator
     socket.on("typing", ({ chatId }) => {
@@ -37,7 +37,7 @@ const initializeSocketServer = (server) => {
     });
 
     socket.on("stopTyping", ({ chatId }) => {
-      socket.to(chatId).emit("stopTyping", { userId: socket.user.id });
+      socket.to(chatId).emit("stoppedTyping", { userId: socket.user.id });
     });
 
     socket.on("error", (message) => {

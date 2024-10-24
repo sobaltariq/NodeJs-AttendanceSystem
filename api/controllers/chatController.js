@@ -1,26 +1,10 @@
+const {
+  INTERNAL_SERVER_ERROR,
+  PARTICIPANTS_FOUND,
+  CHAT_NOT_FOUND,
+} = require("../../utils/errorMessages");
 const chatModel = require("../models/chatModel");
 const userModel = require("../models/userModel");
-
-const createChat = async (req, res) => {
-  const { participants, chatType, groupName, groupAdmin } = req.body;
-
-  console.log(req.body);
-
-  try {
-    const newChat = new chatModel({
-      chatType,
-      // groupName,
-      participants,
-      // groupAdmin,
-    });
-
-    await newChat.save();
-    return res.status(201).json(newChat);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error });
-  }
-};
 
 const getChatHistory = async (req, res) => {
   try {
@@ -36,11 +20,13 @@ const getChatHistory = async (req, res) => {
 
     if (!chatHistory) {
       return res.status(404).json({
-        message: "Chat not found",
+        success: false,
+        message: CHAT_NOT_FOUND,
       });
     }
 
     res.status(200).json({
+      success: true,
       data: chatHistory,
     });
   } catch (error) {
@@ -52,63 +38,30 @@ const getChatHistory = async (req, res) => {
   }
 };
 
-const getAllUsers = async (req, res, next) => {
+const getParticipants = async (req, res, next) => {
   try {
-    const { myId } = req.params;
-    const usersFound = await userModel.findById(myId);
-    if (!usersFound) {
+    const { chatId } = req.params;
+    const chatFound = await chatModel.findById(chatId);
+    if (!chatFound) {
       return res.status(404).json({
-        message: "get user not found",
-        email: req.user.email,
+        success: false,
+        message: CHAT_NOT_FOUND,
       });
     }
-    const formattedUsers = {
-      userId: usersFound._id,
-      userRole: usersFound.role,
-      userName: usersFound.name,
-      userEmail: usersFound.email,
-    };
     return res.status(200).json({
-      message: "get user",
-      data: formattedUsers,
-      // data: usersFound,
+      success: true,
+      message: PARTICIPANTS_FOUND,
+      data: chatFound.participants,
     });
-  } catch (err) {
-    console.log(err.message);
-    res.status(501).json({
-      error: "Internal server error when getting all users",
-    });
-  }
-};
-
-// Update chat by ID
-const updateChat = async (req, res) => {
-  try {
-    const chat = await Chat.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!chat) return res.status(404).json({ error: "Chat not found" });
-    res.json(chat);
   } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Delete chat by ID
-const deleteChat = async (req, res) => {
-  try {
-    const chat = await Chat.findByIdAndDelete(req.params.id);
-    if (!chat) return res.status(404).json({ error: "Chat not found" });
-    res.json({ message: "Chat deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
   }
 };
 
 module.exports = {
-  createChat,
   getChatHistory,
-  getAllUsers,
-  updateChat,
-  deleteChat,
+  getParticipants,
 };

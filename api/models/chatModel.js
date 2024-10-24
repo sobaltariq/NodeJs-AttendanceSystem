@@ -21,7 +21,6 @@ const chatSchema = new mongoose.Schema(
       required: function () {
         return this.chatType === "group";
       },
-      default: null,
     },
     participants: [
       {

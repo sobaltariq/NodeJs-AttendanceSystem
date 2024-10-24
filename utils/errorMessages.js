@@ -117,6 +117,7 @@ module.exports = {
   CAN_NOT_SEND_MESSAGE_IN_THIS_ROOM:
     "Access denied. Cannot send message to this room",
   MESSAGE_IS_TOO_LONG: "Message cannot be more than 500 characters.",
+  PARTICIPANTS_FOUND: "Participants found",
 
   // ########## Socket-related errors End ##########
 

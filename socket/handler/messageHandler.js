@@ -1,6 +1,6 @@
 const { sendMessageServices } = require("../services/sendMessageServices");
 
-const messageHandler = async (socket, { chatId, message }) => {
+const messageHandler = async (io, socket, { chatId, message }) => {
   try {
     if (!chatId || !message || message.trim() === "") {
       socket.emit("error", "chatId and message are required.");
