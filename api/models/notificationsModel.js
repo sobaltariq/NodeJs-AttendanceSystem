@@ -16,16 +16,20 @@ const notificationSchema = new mongoose.Schema(
       default: "unread",
     },
     dateSent: { type: Date, default: Date.now },
+    expiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
 // Index for quick retrieval of unread notifications
-notificationSchema.index({ userId: 1, read: 1 });
+notificationSchema.index({ userId: 1, status: 1 });
 
 // Middleware to mark notification as read
 notificationSchema.methods.markAsRead = async function () {
-  this.read = true;
+  this.status = "read";
   await this.save();
 };
 
