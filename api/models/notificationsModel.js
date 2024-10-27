@@ -27,6 +27,11 @@ const notificationSchema = new mongoose.Schema(
 // Index for quick retrieval of unread notifications
 notificationSchema.index({ userId: 1, status: 1 });
 
+// TTL index for automatic deletion of expired notifications (optional)
+if (notificationSchema.paths.expiresAt) {
+  notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+}
+
 // Middleware to mark notification as read
 notificationSchema.methods.markAsRead = async function () {
   this.status = "read";
