@@ -1,4 +1,6 @@
+const chatModel = require("../../api/models/chatModel");
 const messageModel = require("../../api/models/messageModel");
+const notificationsModel = require("../../api/models/notificationsModel");
 const {
   CAN_NOT_SEND_MESSAGE_IN_THIS_ROOM,
   MESSAGE_IS_TOO_LONG,
@@ -56,6 +58,20 @@ const sendMessageServices = async (socket, messageData) => {
   console.log("Message saved successfully:", savedMessage);
   // Emit the saved message back to the room
   socket.to(chatId).emit("message", savedMessage);
+
+  const chat = await chatModel.findById(chatId).populate("participants");
+  chat.participants.forEach(async (participant) => {
+    const notification = await notificationsModel.create({
+      userId: participant._id,
+      message: `New message from ${senderId}`,
+      type: "info",
+      status: "unread",
+    });
+    console.log(`sent notification ${notification}`);
+
+    socket.to(participant._id.toString()).emit("newNotification", notification);
+  });
+
   return {
     success: true,
     message: savedMessage,

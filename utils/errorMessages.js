@@ -122,6 +122,9 @@ module.exports = {
   // ########## Socket-related errors End ##########
 
   // Notification-related errors
-  //   NOTIFICATION_NOT_FOUND: "Notification not found",
-  //   INVALID_NOTIFICATION_TYPE: "Invalid notification type",
+  NOTIFICATION_NOT_FOUND: "Notification not found",
+  INVALID_NOTIFICATION_TYPE: "Invalid notification type",
+  NOTIFICATION_ALREADY_DELETED: "Notification already deleted",
+  NOTIFICATION_DELETED_SUCCESSFULLY: "Notification deleted successfully",
+  NOTIFICATION_UPDATED_SUCCESSFULLY: "Notification updated successfully",
 };

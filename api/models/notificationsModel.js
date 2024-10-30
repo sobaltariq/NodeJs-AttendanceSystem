@@ -35,6 +35,7 @@ if (notificationSchema.paths.expiresAt) {
 // Middleware to mark notification as read
 notificationSchema.methods.markAsRead = async function () {
   this.status = "read";
+  this.expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // Set expiresAt to 3 days from now
   await this.save();
 };
 
