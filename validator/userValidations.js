@@ -6,6 +6,8 @@ const userRegistrationValidationRules = () => {
     body("name")
       .isString()
       .withMessage("Name must be a string")
+      .isLength({ min: 3 })
+      .withMessage("Name must be at least 3 characters")
       .notEmpty()
       .withMessage("Name is required"),
 
@@ -22,11 +24,12 @@ const userRegistrationValidationRules = () => {
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters long")
       .matches(
-        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$/
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}$/
       )
       .withMessage(
         "Password must contain an uppercase letter, a lowercase letter, a number, and a special character"
       ),
+    body("gender").optional().isIn(["male", "female", "other"]),
 
     // Validate 'role' (optional)
     body("role")

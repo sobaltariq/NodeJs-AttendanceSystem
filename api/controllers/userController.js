@@ -30,7 +30,7 @@ const pendingProfileUpdateModel = require("../models/pendingProfileUpdateModel")
 // Register a new user
 const registerUser = async (req, res) => {
   try {
-    const { name, password, role } = req.body;
+    const { name, gender, password, role } = req.body;
     const profilePicture = req.file;
 
     const email = req.body.email.toLowerCase();
@@ -55,6 +55,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
+      gender,
       role,
       profilePicture: profilePictureUrl,
     });
@@ -65,6 +66,7 @@ const registerUser = async (req, res) => {
     const token = generateToken({
       id: user?._id,
       name: user?.name,
+      gender: user?.gender,
       email: user?.email,
       role: user?.role,
     });
