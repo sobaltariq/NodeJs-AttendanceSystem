@@ -17,6 +17,7 @@ const {
   NO_FIELDS_TO_UPDATE,
   UPDATED_PROFILE_PICTURE_SUCCESSFULLYl,
   PASSWORD_CHANGED_SUCCESSFULLY,
+  USERNAME_ALREADY_EXIST,
 } = require("../../utils/errorMessages");
 const userModel = require("../models/userModel");
 const {
@@ -33,6 +34,8 @@ const registerUser = async (req, res) => {
     const { name, gender, password, role } = req.body;
     const profilePicture = req.file;
 
+    console.log(req.body, profilePicture);
+
     const email = req.body.email.toLowerCase();
 
     // Check if the email is already registered
@@ -40,6 +43,13 @@ const registerUser = async (req, res) => {
     if (alreadyExist) {
       return res.status(400).json({
         error: EMAIL_ALREADY_EXISTS,
+      });
+    }
+    const username = req.body.username.toLowerCase();
+    const userNameExist = await userModel.findOne({ username });
+    if (userNameExist) {
+      return res.status(400).json({
+        error: USERNAME_ALREADY_EXIST,
       });
     }
 
@@ -53,6 +63,7 @@ const registerUser = async (req, res) => {
     // Create a new user document
     const user = new userModel({
       name,
+      username,
       email,
       password,
       gender,
@@ -66,6 +77,7 @@ const registerUser = async (req, res) => {
     const token = generateToken({
       id: user?._id,
       name: user?.name,
+      username: user?.username,
       gender: user?.gender,
       email: user?.email,
       role: user?.role,
@@ -74,7 +86,7 @@ const registerUser = async (req, res) => {
     console.log(token);
 
     // Set JWT in HttpOnly cookie
-    res.cookie("token", token, {
+    res.cookie("authToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true in production
       sameSite: "Strict", // or 'Lax' based on your needs
@@ -126,7 +138,7 @@ const loginUser = async (req, res) => {
     // console.log(token, user.toJSON());
 
     // Set JWT in HttpOnly cookie
-    res.cookie("token", token, {
+    res.cookie("authToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true in production
       sameSite: "Strict", // or 'Lax' based on your needs

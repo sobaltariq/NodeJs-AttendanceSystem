@@ -13,6 +13,7 @@ module.exports = {
   USER_NOT_FOUND: "User not found",
   EMAIL_ALREADY_EXISTS:
     "Email already registered, please try another email, or contact the admin",
+  USERNAME_ALREADY_EXIST: "Username already exists",
   SERVER_ERROR: "An error occurred on the server",
   EMAIL_NOT_FOUND: "Email not found",
   INVALID_PASSWORD: "Invalid password",
