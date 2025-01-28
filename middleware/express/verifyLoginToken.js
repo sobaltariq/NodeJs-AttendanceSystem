@@ -9,7 +9,7 @@ const verifyLoginToken = async (req, res, next) => {
   // Check Authorization header
   const tokenFromHeader = req.headers["authorization"]?.split(" ")[1];
   // Check cookies
-  const tokenFromCookie = req.cookies["token"];
+  const tokenFromCookie = req.cookies["authToken"];
 
   // Prefer token from header if both are present
   const token = tokenFromHeader || tokenFromCookie;

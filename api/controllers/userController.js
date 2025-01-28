@@ -94,12 +94,15 @@ const registerUser = async (req, res) => {
     });
 
     return res.status(201).json({
+      success: true,
       message: REGISTRATION_SUCCESS,
       user,
       token,
     });
   } catch (error) {
-    res.status(400).json({ err: error.message || INTERNAL_SERVER_ERROR });
+    res
+      .status(400)
+      .json({ success: true, err: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -107,7 +110,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     // to check if already logged in
-    const tokenFromCookies = req.cookies["token"];
+    const tokenFromCookies = req.cookies["authToken"];
     if (tokenFromCookies) {
       return res.status(200).json({
         message: ALREADY_LOGGED_IN,
@@ -146,22 +149,27 @@ const loginUser = async (req, res) => {
     });
 
     res.status(200).json({
+      success: true,
       message: LOGIN_SUCCESS,
       user: user.toJSON(), // to hide password
       token,
     });
   } catch (err) {
-    res.status(400).json({ error: err.message || INTERNAL_SERVER_ERROR });
+    res
+      .status(400)
+      .json({ success: true, error: err.message || INTERNAL_SERVER_ERROR });
   }
 };
 
 // logout
 const logoutUser = async (req, res) => {
   try {
-    res.clearCookie("token");
-    res.status(200).json({ message: LOGOUT_SUCCESS });
+    res.clearCookie("authToken");
+    res.status(200).json({ success: true, message: LOGOUT_SUCCESS });
   } catch (err) {
-    res.status(500).json({ error: err.message || INTERNAL_SERVER_ERROR });
+    res
+      .status(500)
+      .json({ success: true, error: err.message || INTERNAL_SERVER_ERROR });
   }
 };
 
