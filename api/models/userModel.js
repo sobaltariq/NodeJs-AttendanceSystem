@@ -34,7 +34,12 @@ const userSchema = new mongoose.Schema(
     jobTitle: { type: String },
     department: { type: String },
     officeLocation: { type: String },
-    position: { type: String, default: "Internee" },
+    position: { type: String, default: "Other" },
+    userStatus: {
+      type: String,
+      enum: ["Permanent", "Contract", "Internship", "Probation", "Other"],
+      default: "Other",
+    },
     leaveRequests: [
       { type: mongoose.Schema.Types.ObjectId, ref: "LeaveRequest" },
     ],

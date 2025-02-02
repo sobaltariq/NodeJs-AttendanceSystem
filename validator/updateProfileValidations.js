@@ -114,6 +114,7 @@ const adminUpdateUserValidationRules = () => {
       .withMessage("Invalid office location."),
 
     body("position").optional().isString().withMessage("Invalid position."),
+    body("userStatus").optional().isString().withMessage("Invalid position."),
 
     body("paidLeavesTaken")
       .optional()
