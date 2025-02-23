@@ -17,6 +17,7 @@ module.exports = {
   SERVER_ERROR: "An error occurred on the server",
   EMAIL_NOT_FOUND: "Email not found",
   INVALID_PASSWORD: "Invalid password",
+  INVALID_CURRENT_PASSWORD: "Invalid current password",
   ALREADY_LOGGED_IN: "You are already logged in",
   NO_TOKEN_PROVIDED: "Access denied. No token provided.",
   INVALID_TOKEN: "Invalid or expired token.",

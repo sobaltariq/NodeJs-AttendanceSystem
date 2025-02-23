@@ -18,6 +18,7 @@ const {
   UPDATED_PROFILE_PICTURE_SUCCESSFULLYl,
   PASSWORD_CHANGED_SUCCESSFULLY,
   USERNAME_ALREADY_EXIST,
+  INVALID_CURRENT_PASSWORD,
 } = require("../../utils/errorMessages");
 const userModel = require("../models/userModel");
 const {
@@ -104,7 +105,7 @@ const registerUser = async (req, res) => {
   } catch (error) {
     res
       .status(400)
-      .json({ success: true, err: error.message || INTERNAL_SERVER_ERROR });
+      .json({ success: false, err: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -159,7 +160,7 @@ const loginUser = async (req, res) => {
   } catch (err) {
     res
       .status(400)
-      .json({ success: true, error: err.message || INTERNAL_SERVER_ERROR });
+      .json({ success: false, error: err.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -171,7 +172,7 @@ const logoutUser = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ success: true, error: err.message || INTERNAL_SERVER_ERROR });
+      .json({ success: false, error: err.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -187,10 +188,11 @@ const getUserProfile = async (req, res) => {
     }
 
     return res.status(200).json({
+      success: true,
       user,
     });
   } catch (err) {
-    res.status(500).json({ error: err.message || INTERNAL_SERVER_ERROR });
+    res.status(500).json({ success: false, error: err.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -208,10 +210,11 @@ const getUserByIdForAdmin = async (req, res) => {
       return res.status(404).json({ error: USER_NOT_FOUND });
     }
     return res.status(200).json({
+      success: true,
       user,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(500).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -244,11 +247,12 @@ const updateUserProfile = async (req, res) => {
       .select("-password -__v");
 
     return res.status(200).json({
+      success: true,
       message: UPDATED_PROFILE_PICTURE_SUCCESSFULLYl,
       user: updatedUser,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(400).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -276,10 +280,11 @@ const adminDeleteUserById = async (req, res) => {
     }
     await userModel.findByIdAndDelete(userId);
     res.json({
+      success: true,
       message: USER_DELETED_SUCCESSFULLY,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(500).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -308,11 +313,12 @@ const adminUpdateUserById = async (req, res) => {
     }
 
     res.status(200).json({
+      success: true,
       message: USER_UPDATED_SUCCESSFULLY,
       updatedUser,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(400).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -329,15 +335,15 @@ const changePassword = async (req, res) => {
     // Check if the password is correct
     const passwordMatch = await user.comparePassword(oldPassword);
     if (!passwordMatch) {
-      return res.status(401).json({ error: INVALID_PASSWORD });
+      return res.status(401).json({ error: INVALID_CURRENT_PASSWORD });
     }
 
     // Hash the new password
     user.password = newPassword;
     await user.save();
-    res.status(200).json({ message: PASSWORD_CHANGED_SUCCESSFULLY });
+    res.status(200).json({ success: true, message: PASSWORD_CHANGED_SUCCESSFULLY });
   } catch (error) {
-    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(500).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -365,6 +371,7 @@ const adminGetAllUsers = async (req, res) => {
     const totalPages = Math.ceil(totalUsers / limit);
 
     res.status(200).json({
+      success: true,
       users,
       currentPage,
       totalPages,
@@ -373,7 +380,7 @@ const adminGetAllUsers = async (req, res) => {
 
     // const usersFound = await userModel.find().select("-password -jobTitle");
   } catch (error) {
-    res.status(500).json({ error: error.message || INTERNAL_SERVER_ERROR });
+    res.status(500).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
   }
 };
 
