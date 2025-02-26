@@ -260,11 +260,11 @@ const getMyAttendanceByMonth = async (req, res) => {
     });
 
     // Print log for debugging date ranges
-    console.log("User ID:", userId);
-    console.log("Target Month:", targetMonth + 1);
-    console.log("Target Year:", targetYear);
-    console.log("Start of Month:", startOfMonth.toISOString());
-    console.log("Start of Next Month:", startOfNextMonth.toISOString());
+    // console.log("User ID:", userId);
+    // console.log("Target Month:", targetMonth + 1);
+    // console.log("Target Year:", targetYear);
+    // console.log("Start of Month:", startOfMonth.toISOString());
+    // console.log("Start of Next Month:", startOfNextMonth.toISOString());
 
     // console.log("Attendance Records:", attendanceRecords);
 

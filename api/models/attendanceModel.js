@@ -32,6 +32,9 @@ attendanceSchema.index({ userId: 1, todayDate: 1 }, { unique: true });
 
 // Middleware to set the attendance status based on check-in time
 attendanceSchema.pre("save", function (next) {
+  if (this.status) {
+    return next();
+  }
   const checkInHour = this.checkInTime.getHours();
 
   if (checkInHour < parseInt(process.env.ATTENDANCE_TIME_1, 10)) {
