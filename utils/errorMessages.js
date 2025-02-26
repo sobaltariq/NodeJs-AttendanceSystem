@@ -43,6 +43,7 @@ module.exports = {
   INVALID_ATTENDANCE_STATUS: "Invalid attendance status",
   ATTENDANCE_CREATED_SUCCESSFULLY: "Attendance created successfully",
   ATTENDANCE_ALREADY_UPDATED: "Attendance already updated",
+  MONTH_YEAR_REQUIRED: "Month and Year are required",
 
   // Feedback
   FEEDBACK_NOT_FOUND: "Feedback not found",

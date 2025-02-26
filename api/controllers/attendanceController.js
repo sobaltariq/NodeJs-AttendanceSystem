@@ -237,6 +237,56 @@ const getAttendanceByUserId = async (req, res) => {
   }
 };
 
+const getMyAttendanceByMonth = async (req, res) => {
+
+  try {
+    const { month, year } = req.query;
+    const userId = req.user.id;
+
+    if (!month || !year) {
+      return res.status(400).json({ success: false, error: MONTH_YEAR_REQUIRED });
+    }
+
+    const targetMonth = month ? parseInt(month, 10) - 1 : new Date().getMonth();
+    const targetYear = year ? parseInt(year, 10) : new Date().getFullYear();
+
+    const startOfMonth = new Date(targetYear, targetMonth, 1);
+    const startOfNextMonth = new Date(targetYear, targetMonth + 1, 1);
+
+
+    const attendanceRecords = await attendanceModel.find({
+      userId: userId,
+      todayDate: { $gt: startOfMonth, $lte: startOfNextMonth },
+    });
+
+    // Print log for debugging date ranges
+    console.log("User ID:", userId);
+    console.log("Target Month:", targetMonth + 1);
+    console.log("Target Year:", targetYear);
+    console.log("Start of Month:", startOfMonth.toISOString());
+    console.log("Start of Next Month:", startOfNextMonth.toISOString());
+
+    // console.log("Attendance Records:", attendanceRecords);
+
+
+    if (!attendanceRecords) {
+      return res.status(404).json({
+        success: false,
+        message: ATTENDANCE_NOT_FOUND,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      attendanceRecords,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
 // Update an attendance record by ID
 const updateAttendance = async (req, res) => {
   try {
@@ -299,5 +349,6 @@ module.exports = {
   getAttendanceForCurrentYear,
   getAttendanceForAllTime,
   getAttendanceByUserId,
+  getMyAttendanceByMonth,
   updateAttendance,
 };

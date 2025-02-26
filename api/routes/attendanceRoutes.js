@@ -10,6 +10,7 @@ const {
   getAttendanceForAllTime,
   getAttendanceForCurrentYear,
   getAttendanceByUserId,
+  getMyAttendanceByMonth,
   updateAttendance,
 } = require("../controllers/attendanceController");
 const { checkAdminRole } = require("../../middleware/express/userTypeCheck");
@@ -42,6 +43,8 @@ router.get(
   checkAdminRole,
   getAttendanceForCurrentYear
 );
+
+router.get("/user/month", verifyLoginToken, getMyAttendanceByMonth);
 router.get("/user/:userId", verifyLoginToken, getAttendanceByUserId);
 router.patch("/:userId", verifyLoginToken, checkAdminRole, updateAttendance);
 
