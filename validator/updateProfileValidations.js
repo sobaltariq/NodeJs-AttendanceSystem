@@ -44,6 +44,14 @@ const requestSensitiveFieldUpdateValidationRules = () => {
       .isLength({ min: 1 })
       .withMessage("Account number cannot be empty."),
 
+    // Validate accountHolder
+    body("accountHolder")
+      .optional()
+      .isString()
+      .withMessage("Account holder must be a string.")
+      .isLength({ min: 1 })
+      .withMessage("Account holder cannot be empty."),
+
     // Validate address
     body("address")
       .optional()

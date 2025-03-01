@@ -5,12 +5,12 @@ const attendanceModel = require("../../api/models/attendanceModel");
 
 // Schedule the job to run at midnight every day
 // cron.schedule("*/20 * * * * *", async () => {
-cron.schedule("0 19 * * *", async () => {
+cron.schedule("0 0 * * 1-5", async () => {
   console.log("Checking for users who missed punch-in...");
 
   try {
     const now = new Date();
-    now.setUTCHours(19, 0, 0, 0);
+    now.setUTCHours(0, 0, 0, 0);
     const startOfToday = new Date(now.setHours(0, 0, 0, 0));
     console.log(startOfToday);
 

@@ -25,16 +25,25 @@ const markAttendance = async (req, res) => {
       console.log("admin", userId);
     }
 
-    const todayDate = new Date().setHours(0, 0, 0, 0);
-    console.log(todayDate);
+    const now = new Date();
+    const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+    const endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+
+
+    console.log(startOfDay, endOfDay);
 
     // Check if an attendance record already exists for today
     const existingAttendance = await attendanceModel.findOne({
       userId,
-      todayDate,
+      todayDate: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      },
     });
 
     if (existingAttendance) {
+      console.log(existingAttendance.todayDate);
+
       return res.status(400).json({
         success: false,
         message: DUPLICATE_ATTENDANCE_ENTRY,
@@ -44,7 +53,7 @@ const markAttendance = async (req, res) => {
     // Create a new attendance record
     const newAttendance = new attendanceModel({
       userId,
-      todayDate,
+      startOfDay,
       status: "present",
     });
 

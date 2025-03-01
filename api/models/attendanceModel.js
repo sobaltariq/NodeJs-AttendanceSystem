@@ -10,7 +10,10 @@ const attendanceSchema = new mongoose.Schema(
     },
     todayDate: {
       type: Date,
-      default: () => new Date().setHours(0, 0, 0, 0), // Resets time to midnight
+      default: () => {
+        const now = new Date();
+        return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0)); // Midnight UTC
+      } // Resets time to midnight
     },
     status: {
       type: String,
@@ -66,6 +69,8 @@ attendanceSchema.pre("save", async function (next) {
   });
 
   if (existingAttendance) {
+    console.log(existingAttendance);
+
     return next(new Error("Attendance for today already exists."));
   }
 
