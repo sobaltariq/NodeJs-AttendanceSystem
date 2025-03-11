@@ -26,9 +26,8 @@ const markAttendance = async (req, res) => {
     }
 
     const now = new Date();
-    const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-    const endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
-
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
     console.log(startOfDay, endOfDay);
 
@@ -42,8 +41,6 @@ const markAttendance = async (req, res) => {
     });
 
     if (existingAttendance) {
-      console.log(existingAttendance.todayDate);
-
       return res.status(400).json({
         success: false,
         message: DUPLICATE_ATTENDANCE_ENTRY,

@@ -76,6 +76,7 @@ module.exports = {
   LEAVE_REQUEST_DELETED_SUCCESSFULLY: "Leave request deleted successfully",
   LEAVE_REQUEST_ALREADY_FOUND: "Leave request already found",
   STATUS_IS_REQUIRED: "Status is required",
+  DIFFERENT_START_AND_END_DATE: "End date cannot be earlier than start date.",
 
   // NoticeBoard-related errors
   NOTICE_NOT_FOUND: "Notice not found",

@@ -8,6 +8,8 @@ const {
   LEAVE_BALANCE_INSUFFICIENT,
   LEAVE_REQUEST_ALREADY_FOUND,
   STATUS_IS_REQUIRED,
+  INVALID_LEAVE_DATES,
+  DIFFERENT_START_AND_END_DATE,
 } = require("../../utils/errorMessages");
 const userModel = require("../models/userModel");
 const leaveRequestModel = require("../models/leaveRequestModel");
@@ -27,9 +29,27 @@ const createLeaveRequest = async (req, res) => {
         message: USER_NOT_FOUND,
       });
     }
-    // Calculate the number of leave days
+
+
     const start = new Date(startDate);
     const end = new Date(endDate);
+
+    // Validate dates
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: INVALID_LEAVE_DATES,
+      });
+    }
+
+    if (end < start) {
+      return res.status(400).json({
+        success: false,
+        message: DIFFERENT_START_AND_END_DATE,
+      });
+    }
+
+    // Calculate the number of leave days
     const daysRequested = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
     // Check if the user has enough leave balance
