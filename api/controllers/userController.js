@@ -384,6 +384,30 @@ const adminGetAllUsers = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+
+    // Find all users with pagination
+    const users = await userModel
+      .find()
+      .select("-password -jobTitle");
+
+    // Get the total count of users
+    const totalUsers = await userModel.countDocuments();
+
+
+    res.status(200).json({
+      success: true,
+      users,
+      totalUsers,
+    });
+
+    // const usersFound = await userModel.find().select("-password -jobTitle");
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message || INTERNAL_SERVER_ERROR });
+  }
+}
+
 module.exports = {
   registerUser,
   loginUser,
@@ -395,4 +419,5 @@ module.exports = {
   updateUserProfile,
   adminGetAllUsers,
   changePassword,
+  getAllUsers
 };

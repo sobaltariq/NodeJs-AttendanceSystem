@@ -14,7 +14,7 @@ const getCurrentEmployeeOfTheMonth = async (req, res) => {
   try {
     const employeeOfTheMonth = await employeeOfTheMonthModel
       .findOne({})
-      .populate("employeeId", "name username")
+      .populate("employeeId", "name username monthlyPoints")
       .sort({ awardedAt: -1 });
 
     if (!employeeOfTheMonth) {
@@ -154,20 +154,56 @@ const updateEmployeeOfTheMonth = async (req, res) => {
 // Get all employee of the month records
 const getEmployeeOfTheMonthHistory = async (req, res) => {
   try {
-    const eotm = await employeeOfTheMonthModel.find().sort({ date: -1 });
+    const eotm = await employeeOfTheMonthModel.find().populate("employeeId", "name username monthlyPoints").sort({ awardedAt: -1 });
     res.status(200).json({
-      employeeOfTheMonthHistory: eotm,
+      success: true,
+      data: eotm,
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
       error: error.message || INTERNAL_SERVER_ERROR,
     });
   }
 };
+
+const getAllEmployeesByPoints = async (req, res) => {
+  try {
+    // Get the current month and year
+    const currentMonth = new Date().toLocaleString("en-US", { month: "long" }).toLowerCase(); // Current month (1 to 12)
+    const currentYear = new Date().getFullYear(); // Current year
+
+    // Find all employees with monthlyPoints greater than 0, sorted by points descending
+    const employees = await employeeOfTheMonthModel.find({
+      month: currentMonth,
+      year: currentYear,
+    }).populate("employeeId", "name username monthlyPoints");
+
+    if (!employees || employees.length === 0) {
+      return res.status(404).json({
+        success: false,
+        currentMonth,
+        message: EMPLOYEE_OF_THE_MONTH_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: employees,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+
+}
 
 module.exports = {
   getCurrentEmployeeOfTheMonth,
   updateEmployeeOfTheMonth,
   setEmployeeOfTheMonth,
   getEmployeeOfTheMonthHistory,
+  getAllEmployeesByPoints
 };

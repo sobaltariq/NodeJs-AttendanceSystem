@@ -132,10 +132,11 @@ const getLeaveRequestById = async (req, res) => {
     });
   }
 };
+
 const getLeaveRequestByUser = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const user = await userModel.findById(userId).populate("leaveRequests");
+    const user = await userModel.findById(userId).populate("leaveRequests").populate("paidLeavesTaken").populate("leaveBalance");
     // .populate("userId");
 
     if (user.leaveRequests.length < 0) {
@@ -148,6 +149,8 @@ const getLeaveRequestByUser = async (req, res) => {
     res.status(200).json({
       success: true,
       total: user.leaveRequests.length,
+      leavesTaken: user.paidLeavesTaken,
+      leavesBalance: user.leaveBalance,
       data: user.leaveRequests,
     });
   } catch (error) {
@@ -164,31 +167,65 @@ const updateLeaveRequest = async (req, res) => {
     const { status } = req.body;
     const leaveRequestId = req.params.id;
     const userId = req.user.id;
+
+    // Find the leave request by ID
     const leaveRequest = await leaveRequestModel.findById(leaveRequestId);
-    if (leaveRequest.status === status) {
-      return res.status(400).json({
-        success: false,
-        message: `Already ${status}`,
-      });
-    }
-
-    const updatedLeaveRequest = await leaveRequestModel.findByIdAndUpdate(
-      leaveRequestId,
-      { $set: { status, approvedBy: userId } },
-      { new: true }
-    );
-
-    if (!updatedLeaveRequest) {
+    if (!leaveRequest) {
       return res.status(404).json({
-        success: false,
+        error: false,
         message: LEAVE_REQUEST_NOT_FOUND,
       });
     }
 
+    // Check if the status is already the same as requested
+    if (leaveRequest.status === status) {
+      return res.status(400).json({
+        error: false,
+        message: `Already ${status}`,
+      });
+    }
+
+    // Find the user associated with this leave request
+    const user = await userModel.findById(leaveRequest.userId);
+    if (!user) {
+      return res.status(404).json({
+        error: false,
+        message: USER_NOT_FOUND,
+      });
+    }
+
+    if (status === "approved") {
+      // Check if the user has enough leave balance
+      if (user.leaveBalance < leaveRequest.daysRequested) {
+        return res.status(400).json({
+          error: false,
+          message: LEAVE_BALANCE_INSUFFICIENT,
+        });
+      }
+
+      // Update user's leave balance and paid leaves taken
+      user.leaveBalance -= leaveRequest.daysRequested;
+      user.paidLeavesTaken += leaveRequest.daysRequested;
+    } else if (status === "rejected" && leaveRequest.status === "approved") {
+      // Restore leave balance and decrease paid leaves taken if previously approved
+      user.leaveBalance += leaveRequest.daysRequested;
+      user.paidLeavesTaken -= leaveRequest.daysRequested;
+    }
+
+    // Save user changes if any
+    await user.save();
+
+    // Update the leave request status and who approved/rejected it
+    leaveRequest.status = status;
+    leaveRequest.approvedBy = userId;
+
+    // Save the updated leave request
+    await leaveRequest.save();
+
     res.status(200).json({
       success: true,
       message: LEAVE_REQUEST_UPDATED_SUCCESSFULLY,
-      data: updatedLeaveRequest,
+      data: leaveRequest,
     });
   } catch (error) {
     res.status(500).json({

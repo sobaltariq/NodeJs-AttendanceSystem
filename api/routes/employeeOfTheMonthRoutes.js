@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getCurrentEmployeeOfTheMonth,
   getEmployeeOfTheMonthHistory,
+  getAllEmployeesByPoints,
   setEmployeeOfTheMonth,
   updateEmployeeOfTheMonth,
 } = require("../controllers/employeeOfTheMonthController");
@@ -19,6 +20,7 @@ const router = express.Router();
 
 router.get("/", verifyLoginToken, getCurrentEmployeeOfTheMonth);
 router.get("/history", verifyLoginToken, getEmployeeOfTheMonthHistory);
+router.get("/monthly-points", verifyLoginToken, getAllEmployeesByPoints);
 router.post(
   "/",
   verifyLoginToken,
