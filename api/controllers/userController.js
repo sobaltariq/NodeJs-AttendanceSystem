@@ -390,11 +390,10 @@ const getAllUsers = async (req, res) => {
     // Find all users with pagination
     const users = await userModel
       .find()
-      .select("-password -jobTitle");
+      .select("_id name username profilePicture role");
 
     // Get the total count of users
     const totalUsers = await userModel.countDocuments();
-
 
     res.status(200).json({
       success: true,

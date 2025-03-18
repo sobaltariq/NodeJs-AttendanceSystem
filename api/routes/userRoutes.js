@@ -11,6 +11,7 @@ const {
   getUserProfile,
   updateUserProfile,
   changePassword,
+  getAllUsers
 } = require("../controllers/userController");
 const {
   userRegistrationValidationRules,
@@ -46,6 +47,8 @@ router.post("/login", loginUser);
 router.post("/logout", verifyLoginToken, logoutUser);
 
 router.get("/profile", verifyLoginToken, getUserProfile);
+
+router.get("/get-all-user", verifyLoginToken, getAllUsers);
 
 router.patch(
   "/profile",
