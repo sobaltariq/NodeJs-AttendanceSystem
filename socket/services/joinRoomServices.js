@@ -49,6 +49,7 @@ const createOrGetPrivateChat = async (userId1, userId2) => {
     const newChat = new chatModel({
       chatType: "private",
       participants: [userId1, userId2],
+      groupName: `private_${Date.now()}`,
     });
     await newChat.save();
 
@@ -60,7 +61,7 @@ const createOrGetPrivateChat = async (userId1, userId2) => {
         joinedAt: Date.now(),
       },
       {
-        chatId: chat._id,
+        chatId: newChat._id,
         userId: userId2,
         role: "member",
         joinedAt: Date.now(),

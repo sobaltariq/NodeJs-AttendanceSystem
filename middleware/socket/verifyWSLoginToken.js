@@ -7,7 +7,7 @@ const {
 const verifyWSLoginToken = (socket, next) => {
   // postman
   // console.log("Handshake data:", socket.handshake);
-  const authHeader = socket.handshake.headers.authorization;
+  const authHeader = socket.handshake.auth.token || socket.handshake.headers.authorization;
 
   // console.log(socket.handshake.auth.token);
   // const authHeader = socket.handshake.auth.token || socket.handshake.headers.authorization;

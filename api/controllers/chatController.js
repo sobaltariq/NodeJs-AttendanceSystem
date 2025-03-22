@@ -4,6 +4,7 @@ const {
   CHAT_NOT_FOUND,
 } = require("../../utils/errorMessages");
 const chatModel = require("../models/chatModel");
+const messageModel = require("../models/messageModel");
 const userModel = require("../models/userModel");
 
 const getChatHistory = async (req, res) => {
@@ -13,17 +14,19 @@ const getChatHistory = async (req, res) => {
 
     console.log("chatId", chatId, "userId", userId);
 
-    const chatHistory = await chatModel.findOne({
+    const chatFound = await chatModel.findOne({
       _id: chatId,
       participants: { $in: [userId] },
     });
 
-    if (!chatHistory) {
+    if (!chatFound) {
       return res.status(404).json({
         success: false,
         message: CHAT_NOT_FOUND,
       });
     }
+
+    const chatHistory = await messageModel.find({ chatId });
 
     res.status(200).json({
       success: true,

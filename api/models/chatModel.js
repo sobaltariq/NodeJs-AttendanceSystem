@@ -14,6 +14,7 @@ const chatSchema = new mongoose.Schema(
         return this.chatType === "group";
       },
       unique: true,
+      sparse: true,
     },
     groupAdmin: {
       type: mongoose.Schema.Types.ObjectId,

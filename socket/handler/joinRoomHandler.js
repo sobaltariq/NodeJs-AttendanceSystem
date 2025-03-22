@@ -1,4 +1,5 @@
 const chatModel = require("../../api/models/chatModel");
+const { INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM } = require("../../utils/errorMessages");
 const { joinRoomServices } = require("../services/joinRoomServices");
 
 const joinRoomHandler = async (
@@ -60,7 +61,7 @@ const joinRoomHandler = async (
     }
   } catch (err) {
     console.error("Error handling joinRoom:", err.message);
-    socket.emit("error", "INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM");
+    socket.emit("error", INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM);
   }
 };
 
