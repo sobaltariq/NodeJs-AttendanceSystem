@@ -27,7 +27,7 @@ const joinRoomServices = (
   if (chatType === "group") {
     if (user.role !== "admin") {
       console.log("Only admins can create group chats");
-      socket.emit("error", ONLY_ADMIN_CAN_CREATE_GROUP);
+      socket.emit("error", { message: ONLY_ADMIN_CAN_CREATE_GROUP });
       return { success: false, message: ONLY_ADMIN_CAN_CREATE_GROUP };
     }
 
@@ -115,7 +115,7 @@ const createOrGetGroupChat = async (
       chat.groupAdmin,
       user.id
     );
-    socket.emit("error", GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN);
+    socket.emit("error", { message: GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN });
     return { success: false, message: GROUP_NAME_TAKEN_BY_ANOTHER_ADMIN };
   }
 

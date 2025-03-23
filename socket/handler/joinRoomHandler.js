@@ -7,9 +7,9 @@ const joinRoomHandler = async (
   { userId, chatType, groupName, participantIds }
 ) => {
   try {
-    console.log("roomId", userId, chatType, groupName, participantIds);
+    // console.log("roomId", userId, chatType, groupName, participantIds);
     if (!userId || !chatType) {
-      socket.emit("error", "userId and chatType are required.");
+      socket.emit("error", { message: "userId and chatType are required." });
       return;
     }
 
@@ -38,7 +38,7 @@ const joinRoomHandler = async (
     if (chat.success) {
       console.log("joined room", chat._id);
 
-      socket.join(chat._id);
+      socket.join(chat._id.toString());
       if (chatType === "group") {
         const groupAdminDetails = await chatModel.findById(chat._id);
         socket.emit("roomJoined", {
@@ -55,13 +55,13 @@ const joinRoomHandler = async (
           message: chat.message,
         });
       }
-      console.log(`Client ${socket.id} joined room: ${chat._id} (${chatType})`);
+      // console.log(`Client ${socket.id} joined room: ${chat._id} (${chatType})`);
     } else {
-      socket.emit("error", chat.message);
+      socket.emit("error", { message: chat.message });
     }
   } catch (err) {
     console.error("Error handling joinRoom:", err.message);
-    socket.emit("error", INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM);
+    socket.emit("error", { message: INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM });
   }
 };
 

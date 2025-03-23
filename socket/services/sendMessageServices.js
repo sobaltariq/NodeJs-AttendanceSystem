@@ -20,6 +20,8 @@ const sendMessageServices = async (socket, messageData) => {
   if (typeof messageData === "string") {
     try {
       messageData = JSON.parse(messageData);
+      console.log("messageData", messageData);
+
     } catch (err) {
       console.error("Error parsing messageData as JSON:", err.message);
       return {
@@ -30,6 +32,7 @@ const sendMessageServices = async (socket, messageData) => {
   }
   // Validate message length
   if (messageData.content.length > 500) {
+    console.log(MESSAGE_IS_TOO_LONG);
     return {
       success: false,
       message: MESSAGE_IS_TOO_LONG,
@@ -56,8 +59,6 @@ const sendMessageServices = async (socket, messageData) => {
   });
 
   console.log("Message saved successfully:", savedMessage);
-  // Emit the saved message back to the room
-  socket.to(chatId).emit("message", savedMessage);
 
   const chat = await chatModel.findById(chatId).populate("participants");
   chat.participants.forEach(async (participant) => {

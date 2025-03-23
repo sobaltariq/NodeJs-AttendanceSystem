@@ -44,10 +44,6 @@ const initializeSocketServer = (server) => {
       console.error(`Error: ${message}`);
     });
 
-    socket.on("message", (message) => {
-      console.error(`Error: ${message}`);
-    });
-
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
     });

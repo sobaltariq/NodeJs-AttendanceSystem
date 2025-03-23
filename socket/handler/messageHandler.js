@@ -3,7 +3,7 @@ const { sendMessageServices } = require("../services/sendMessageServices");
 const messageHandler = async (io, socket, { chatId, message }) => {
   try {
     if (!chatId || !message || message.trim() === "") {
-      socket.emit("error", "chatId and message are required.");
+      socket.emit("error", { message: "chatId and message are required." });
       return;
     }
     const messageData = {
@@ -13,6 +13,7 @@ const messageHandler = async (io, socket, { chatId, message }) => {
     };
 
     const savedMessage = await sendMessageServices(socket, messageData);
+
 
     if (savedMessage.success) {
       // Broadcast the message to all clients in the chat room
@@ -26,13 +27,16 @@ const messageHandler = async (io, socket, { chatId, message }) => {
         chatId,
         message: savedMessage.message,
       });
-      console.log(`Message sent to room ${chatId}`);
+      // console.log(`Broadcasting to room ${chatId}:`, savedMessage.message);
+      // console.log("Connected clients in room:", io.sockets.adapter.rooms.get(chatId)?.size || 0);
+
     } else {
-      socket.emit("error", savedMessage.message);
+      console.log('savedMessage.message', savedMessage.message);
+      socket.emit("error", savedMessage);
     }
   } catch (error) {
     console.error("Error in messageHandler:", error.message);
-    socket.emit("error", "Error sending message.");
+    socket.emit("error", { message: "Error sending message." });
   }
 };
 
