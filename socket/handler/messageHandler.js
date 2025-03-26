@@ -3,7 +3,7 @@ const { sendMessageServices } = require("../services/sendMessageServices");
 const messageHandler = async (io, socket, { chatId, message }) => {
   try {
     if (!chatId || !message || message.trim() === "") {
-      socket.emit("error", { message: "chatId and message are required." });
+      socket.emit("error", { success: false, message: "chatId and message are required." });
       return;
     }
     const messageData = {
@@ -32,11 +32,11 @@ const messageHandler = async (io, socket, { chatId, message }) => {
 
     } else {
       console.log('savedMessage.message', savedMessage.message);
-      socket.emit("error", savedMessage);
+      socket.emit("error", { success: false, message: savedMessage });
     }
   } catch (error) {
     console.error("Error in messageHandler:", error.message);
-    socket.emit("error", { message: "Error sending message." });
+    socket.emit("error", { success: false, message: "Error sending message." });
   }
 };
 

@@ -9,7 +9,7 @@ const joinRoomHandler = async (
   try {
     // console.log("roomId", userId, chatType, groupName, participantIds);
     if (!userId || !chatType) {
-      socket.emit("error", { message: "userId and chatType are required." });
+      socket.emit("error", { success: false, message: "userId and chatType are required." });
       return;
     }
 
@@ -57,11 +57,11 @@ const joinRoomHandler = async (
       }
       // console.log(`Client ${socket.id} joined room: ${chat._id} (${chatType})`);
     } else {
-      socket.emit("error", { message: chat.message });
+      socket.emit("error", { success: false, message: chat.message });
     }
   } catch (err) {
     console.error("Error handling joinRoom:", err.message);
-    socket.emit("error", { message: INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM });
+    socket.emit("error", { success: false, message: INTERNAL_SERVER_ERROR_WHEN_JOINING_ROOM });
   }
 };
 

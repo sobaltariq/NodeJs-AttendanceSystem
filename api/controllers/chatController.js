@@ -63,8 +63,42 @@ const getParticipants = async (req, res, next) => {
     });
   }
 };
+const getMyGroups = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    console.log("userId", userId);
+
+    const chatFound = await chatModel.find({
+      chatType: 'group',
+      [userRole === 'admin' ? 'groupAdmin' : 'participants']: userId
+    });
+
+
+
+    if (!chatFound) {
+      return res.status(404).json({
+        success: false,
+        message: CHAT_NOT_FOUND,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      users: chatFound,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: error.message || INTERNAL_SERVER_ERROR,
+    });
+  }
+};
 
 module.exports = {
   getChatHistory,
   getParticipants,
+  getMyGroups
 };
