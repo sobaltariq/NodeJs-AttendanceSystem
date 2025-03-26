@@ -16,7 +16,7 @@ const getChatHistory = async (req, res) => {
 
     const chatFound = await chatModel.findOne({
       _id: chatId,
-      participants: { $in: [userId] },
+      // participants: { $in: [userId] },
     });
 
     if (!chatFound) {
@@ -63,6 +63,7 @@ const getParticipants = async (req, res, next) => {
     });
   }
 };
+
 const getMyGroups = async (req, res, next) => {
   try {
     const userId = req.user.id;
